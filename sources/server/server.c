@@ -38,12 +38,15 @@ void		client_read(t_env *e, int fd)
 {
   int		r;
   char		buf[4096];
+  int		i;
 
   r = read(fd, buf, 4096);
   if (r > 0)
     {
       buf[r] = '\0';
-      printf("%d: %s\n", fd, buf);
+      for (i = 0; i < MAX_FD; i++)
+	if (i != fd && e->fd_type[i] == FD_CLIENT)
+	  write(i, buf, r);
     }
   else
     {
@@ -68,7 +71,6 @@ void			add_client(t_env *e, int s)
 
 void			server_read(t_env *e, int fd)
 {
-  printf("New client\n");
   add_client(e, fd);
 }
 
@@ -76,8 +78,11 @@ void			add_server(t_env *e)
 {
   int			s;
   struct sockaddr_in	sin;
+  int			val;
 
+  val = 1;
   s = socket(PF_INET, SOCK_STREAM, 0);
+  setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(int));
   sin.sin_family = AF_INET;
   sin.sin_port = htons(e->port);
   sin.sin_addr.s_addr = INADDR_ANY;
@@ -92,7 +97,7 @@ int			main(int ac, char **argv)
 {
   t_env			e;
   int			i;
-  int			fd_max;
+  int			j;
   fd_set		fd_read;
   struct timeval	tv;
 
@@ -101,24 +106,24 @@ int			main(int ac, char **argv)
       memset(e.fd_type, FD_FREE, MAX_FD);
       e.port = atoi(argv[1]);
       add_server(&e);
-      tv.tv_sec = 20;
+      tv.tv_sec = 0;
       tv.tv_usec = 0;
-      while (1)
+      while (42)
 	{
 	  FD_ZERO(&fd_read);
-	  fd_max = 0;
 	  for (i = 0; i < MAX_FD; i++)
 	    {
 	      if (e.fd_type[i] != FD_FREE)
 		{
 		  FD_SET(i, &fd_read);
-		  fd_max = i;
-		  if (select(fd_max + 1, &fd_read, NULL, NULL, &tv) == -1)
-		    perror("select");
-		  for (i = 0; i < MAX_FD; i++)
-		    if (FD_ISSET(i, &fd_read))
-		      e.fct_read[i](&e, i);
-		  printf("waiting...\n");
+		  if (select(i + 1, &fd_read, NULL, NULL, &tv) == -1)
+		    {
+		      perror("select");
+		      exit(42);
+		    }
+		  for (j = 0; j < MAX_FD; j++)
+		    if (FD_ISSET(j, &fd_read))
+		      e.fct_read[j](&e, j);
 		}
 	    }
 	}

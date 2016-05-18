@@ -8,7 +8,7 @@
 ## Last update Tue May 12 14:51:52 2015 kevin malot
 ##
 
-CFLAGS          += -W -Wall -Wextra -Werror -Iincludes
+CFLAGS          += -W -Wall -Wextra -Werror -Iincludes -g
 
 LDFLAGS         = 
 
