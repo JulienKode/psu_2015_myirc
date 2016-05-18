@@ -34,25 +34,56 @@ typedef struct	s_env
   int		port;
 }		t_env;
 
-void		client_read(t_env *e, int fd)
+void		parse_cmd(char *buf, t_env *e, int fd, fd_set *fd_write)
 {
-  int		r;
-  char		buf[4096];
+  char		*cmd;
+  char		*arg_one;
+
+  (void)e;
+  (void)fd;
+  (void)fd_write;
+  cmd = strtok(buf, " \t");
+  arg_one = strtok(NULL, " \t");
+  printf("Commande détéctée : <%s> <%s>\n", cmd, arg_one);
+  // Il faudra reconnaitre les commandes avec un tableau de pointeurs sur fonction
+}
+
+void		send_message(char *buf, t_env *e, int fd, fd_set *fd_write)
+{
   int		i;
 
-  r = read(fd, buf, 4096);
-  if (r > 0)
+  // Il faudra également s'assurer que i est dans le même channel que fd
+  for (i = 0; i < MAX_FD; i++)
+    if (i != fd && e->fd_type[i] == FD_CLIENT && FD_ISSET(i, fd_write))
+      dprintf(i, "%s\n", buf);
+}
+
+void		client_read(t_env *e, int fd, fd_set *fd_read, fd_set *fd_write)
+{
+  char                  *buf;
+  int                   size;
+  size_t                n;
+  FILE                  *fp;
+
+  n = 4096;
+  fp = fdopen(fd, "r");
+  buf = NULL;
+  (void) fd_read;
+  if ((size = getline(&buf, &n, fp)) > 0)
     {
-      buf[r] = '\0';
-      for (i = 0; i < MAX_FD; i++)
-	if (i != fd && e->fd_type[i] == FD_CLIENT)
-	  write(i, buf, r);
+      buf[size - 1] = 0;
+      if (buf[0] == '/')
+	  parse_cmd(buf, e, fd, fd_write);
+      else
+	send_message(buf, e, fd, fd_write);
     }
   else
     {
       printf("Connection closed\n");
+      fclose(fp);
       close(fd);
       e->fd_type[fd] = FD_FREE;
+      return;
     }
 }
 
@@ -69,8 +100,11 @@ void			add_client(t_env *e, int s)
   e->fct_write[cs] = NULL;
 }
 
-void			server_read(t_env *e, int fd)
+void			server_read(t_env *e, int fd, fd_set *fd_read,
+				    fd_set *fd_write)
 {
+  (void) fd_read;
+  (void) fd_write;
   add_client(e, fd);
 }
 
@@ -99,6 +133,7 @@ int			main(int ac, char **argv)
   int			i;
   int			j;
   fd_set		fd_read;
+  fd_set		fd_write;
   struct timeval	tv;
 
   if (ac == 2)
@@ -110,18 +145,27 @@ int			main(int ac, char **argv)
       tv.tv_usec = 0;
       while (42)
 	{
+
+	  /* Init de la liste des fd lecture */
 	  FD_ZERO(&fd_read);
 	  for (i = 0; i < MAX_FD; i++)
 	    if (e.fd_type[i] != FD_FREE)
 	      FD_SET(i, &fd_read);
-	  if (select(MAX_FD, &fd_read, NULL, NULL, &tv) == -1)
+
+	  /* Init de la liste des fd ecriture */
+	  FD_ZERO(&fd_write);
+	  for (i = 0; i < MAX_FD; i++)
+	    if (e.fd_type[i] != FD_FREE)
+	      FD_SET(i, &fd_write);
+
+	  if (select(MAX_FD, &fd_read, &fd_write, NULL, &tv) == -1)
 	    {
 	      perror("select");
 	      exit(42);
 	    }
 	  for (j = 0; j < MAX_FD; j++)
 	    if (FD_ISSET(j, &fd_read))
-	      e.fct_read[j](&e, j);
+	      e.fct_read[j](&e, j, &fd_read, &fd_write);
 	}
     }
   return (0);
