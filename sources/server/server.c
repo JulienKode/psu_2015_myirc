@@ -8,49 +8,111 @@
 ** Last update Mon May 16 10:41:59 2016
 */
 
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <sys/time.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
 #include "irc.h"
 
-#define FD_FREE 0
-#define FD_CLIENT 1
-#define FD_SERVER 2
-#define MAX_FD 255
+t_cmd                   cmds[] =
+  {
+    {"/nick", &cmd_nick},
+    {"/list", &cmd_list},
+    {"/join", &cmd_join},
+    {"/part", &cmd_part},
+    {"/users", &cmd_users},
+    {"/msg", &cmd_msg},
+    {"/send_file", &cmd_send},
+    {"/accept_file", &cmd_accept},
+  };
 
-typedef void(*fct)();
-
-typedef struct	s_env
+void	cmd_nick(int fd, t_env *e, fd_set *fd_write, char *arg_one)
 {
-  char		fd_type[MAX_FD];
-  fct		fct_read[MAX_FD];
-  fct		fct_write[MAX_FD];
-  int		port;
-}		t_env;
-
-void		parse_cmd(char *buf, t_env *e, int fd, fd_set *fd_write)
-{
-  char		*cmd;
-  char		*arg_one;
-
-  (void)e;
-  (void)fd;
-  (void)fd_write;
-  cmd = strtok(buf, " \t");
-  arg_one = strtok(NULL, " \t");
-  printf("Commande détéctée : <%s> <%s>\n", cmd, arg_one);
-  // Il faudra reconnaitre les commandes avec un tableau de pointeurs sur fonction
+  (void) fd;
+  (void) e;
+  (void) fd_write;
+  (void) arg_one;
 }
 
-void		send_message(char *buf, t_env *e, int fd, fd_set *fd_write)
+void	cmd_list(int fd, t_env *e, fd_set *fd_write, char *arg_one)
 {
-  int		i;
+  (void) fd;
+  (void) e;
+  (void) fd_write;
+  (void) arg_one;
+}
+
+void	cmd_join(int fd, t_env *e, fd_set *fd_write, char *arg_one)
+{
+  (void) fd;
+  (void) e;
+  (void) fd_write;
+  (void) arg_one;
+}
+
+void	cmd_part(int fd, t_env *e, fd_set *fd_write, char *arg_one)
+{
+  (void) fd;
+  (void) e;
+  (void) fd_write;
+  (void) arg_one;
+}
+
+void	cmd_users(int fd, t_env *e, fd_set *fd_write, char *arg_one)
+{
+  (void) fd;
+  (void) e;
+  (void) fd_write;
+  (void) arg_one;
+}
+
+void	cmd_msg(int fd, t_env *e, fd_set *fd_write, char *arg_one)
+{
+  (void) fd;
+  (void) e;
+  (void) fd_write;
+  (void) arg_one;
+}
+
+void	cmd_send(int fd, t_env *e, fd_set *fd_write, char *arg_one)
+{
+  (void) fd;
+  (void) e;
+  (void) fd_write;
+  (void) arg_one;
+}
+
+void	cmd_accept(int fd, t_env *e, fd_set *fd_write, char *arg_one)
+{
+  (void) fd;
+  (void) e;
+  (void) fd_write;
+  (void) arg_one;
+}
+
+void			parse_cmd(char *buf, t_env *e, int fd, fd_set *fd_write)
+{
+  char			*cmd;
+  char			*arg_one;
+  int			i;
+  int			valid;
+
+  cmd = strtok(buf, " \t");
+  arg_one = strtok(NULL, " \t");
+  i = 0;
+  valid = 0;
+  while (i < CMD_NUMBER)
+    {
+      if (cmd && strcmp(cmds[i].name, cmd) == 0)
+	{
+	  cmds[i].p(fd, e, fd_write, arg_one);
+	  valid = 1;
+	}
+      i++;
+    }
+  if (valid == 0)
+    dprintf(fd, "Unknown command\n");
+}
+
+void			send_message(char *buf, t_env *e, int fd, fd_set *fd_write)
+{
+  int			i;
 
   // Il faudra également s'assurer que i est dans le même channel que fd
   for (i = 0; i < MAX_FD; i++)
@@ -58,12 +120,13 @@ void		send_message(char *buf, t_env *e, int fd, fd_set *fd_write)
       dprintf(i, "%s\n", buf);
 }
 
-void		client_read(t_env *e, int fd, fd_set *fd_read, fd_set *fd_write)
+void			client_read(t_env *e, int fd, fd_set *fd_read,
+				    fd_set *fd_write)
 {
-  char                  *buf;
-  int                   size;
-  size_t                n;
-  FILE                  *fp;
+  char			*buf;
+  int			size;
+  size_t		n;
+  FILE			*fp;
 
   n = 4096;
   fp = fdopen(fd, "r");
