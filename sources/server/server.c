@@ -112,20 +112,16 @@ int			main(int ac, char **argv)
 	{
 	  FD_ZERO(&fd_read);
 	  for (i = 0; i < MAX_FD; i++)
+	    if (e.fd_type[i] != FD_FREE)
+	      FD_SET(i, &fd_read);
+	  if (select(MAX_FD, &fd_read, NULL, NULL, &tv) == -1)
 	    {
-	      if (e.fd_type[i] != FD_FREE)
-		{
-		  FD_SET(i, &fd_read);
-		  if (select(i + 1, &fd_read, NULL, NULL, &tv) == -1)
-		    {
-		      perror("select");
-		      exit(42);
-		    }
-		  for (j = 0; j < MAX_FD; j++)
-		    if (FD_ISSET(j, &fd_read))
-		      e.fct_read[j](&e, j);
-		}
+	      perror("select");
+	      exit(42);
 	    }
+	  for (j = 0; j < MAX_FD; j++)
+	    if (FD_ISSET(j, &fd_read))
+	      e.fct_read[j](&e, j);
 	}
     }
   return (0);
