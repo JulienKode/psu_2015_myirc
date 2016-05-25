@@ -16,7 +16,8 @@ NAME_SERVER	= server
 
 NAME_CLIENT	= client
 
-SRC_SERVER	= sources/server/server.c
+SRC_SERVER	= 	sources/server/server.c \
+			sources/utils/list.c
 
 SRC_CLIENT	= sources/server/client.c
 
