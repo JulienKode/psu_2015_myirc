@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Wed May 18 21:29:44 2016  Julien Kast
-** Last update Wed May 25 20:43:09 2016 
+** Last update Wed May 25 21:20:18 2016 
 */
 
 #include	"utils_circbuff.h"
@@ -54,9 +54,13 @@ static int	circbuff_len(t_circbuff *data)
   while (c && data->rpos < (data->maxLen + 1))
     {
       c = data->buffer[data->rpos];
+      printf("LEN %c %d\n", c, data->rpos);
       if (len == 1 && c == 0)
 	while (c == 0)
+	  {
+	    printf("OK %c %d\n", c, data->rpos);
 	    c = data->buffer[data->rpos++];
+	  }
       else
 	data->rpos++;
       if (data->rpos >= data->maxLen)
@@ -77,20 +81,23 @@ char		*circbuff_read(t_circbuff *data)
   len = circbuff_len(data);
   tmp = malloc(len * sizeof(char));
   tmp[i] = 0;
-  while (i < len && data->rpos < (data->maxLen + 1))
+  while (i < (len - 2) && data->rpos < (data->maxLen + 1))
     {
       tmp[i] = data->buffer[data->rpos];
+      printf("READ %c %d\n", tmp[i], data->rpos);
       if (i == 0 && tmp[i] == 0)
 	while (tmp[i] == 0)
 	    tmp[i] = data->buffer[data->rpos++];
       else
 	data->rpos++;
+      printf("READ After %c %d\n", tmp[i], data->rpos);
       if (data->rpos >= data->maxLen)
 	data->rpos = 0;
       i++;
     }
   tmp[i + 1] = 0;
   data->rpos++;
+  printf("READ %c %d\n", tmp[i], data->rpos);
   if (data->rpos >= data->maxLen)
     data->rpos = 0;
   return (tmp);
