@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Wed May 18 21:29:44 2016  Julien Kast
-** Last update Wed May 25 18:39:40 2016 
+** Last update Wed May 25 20:35:01 2016 
 */
 
 #include	"utils_circbuff.h"
@@ -58,8 +58,13 @@ static int	circbuff_len(t_circbuff *data)
   while (c && data->rpos < (data->maxLen + 1))
     {
       c = data->buffer[data->rpos];
-      printf("LEN buff[%d] = [%c]\n", data->rpos, data->buffer[data->rpos]);
-      data->rpos++;
+      if (len == 1 && c == 0)
+	while (c == 0)
+	    c = data->buffer[data->rpos++];
+      else
+	data->rpos++;
+      printf("LEN buff[%d] = [%c]\n", data->rpos, c);
+      sleep(1);
       if (data->rpos >= data->maxLen)
 	data->rpos = 0;
       len++;
@@ -70,18 +75,28 @@ static int	circbuff_len(t_circbuff *data)
 
 char		*circbuff_read(t_circbuff *data)
 {
+  int		len;
   char		*tmp;
   int		i;
 
   i = 0;
-  printf("Read [%d]\n", circbuff_len(data));
-  tmp = malloc(circbuff_len(data) * sizeof(char));
-  tmp[i] = 1;
-  while (data->buffer[data->rpos] && data->rpos < (data->maxLen + 1))
+  len = circbuff_len(data);
+  printf("Read [%d]\n", len);
+  tmp = malloc(len * sizeof(char));
+  tmp[i] = 0;
+  while (i < len && data->rpos < (data->maxLen + 1))
     {
       tmp[i] = data->buffer[data->rpos];
-      printf("READ buff[%d] = [%c]\n", data->rpos, data->buffer[data->rpos]);
-      data->rpos++;
+      printf("READPP buff[%d] = [%c]\n", data->rpos, tmp[i]);
+      if (i == 0 && tmp[i] == 0)
+	while (tmp[i] == 0)
+	  {
+	    tmp[i] = data->buffer[data->rpos++];
+	    printf("READAA buff[%d] = [%c]\n", data->rpos, tmp[i]);
+	  }
+      else
+	data->rpos++;
+      printf("READ buff[%d] = [%c]\n", data->rpos, tmp[i]);
       if (data->rpos >= data->maxLen)
 	data->rpos = 0;
       i++;
@@ -101,6 +116,11 @@ int main()
   t_circbuff	toto = circbuff_create(10);
   circbuff_write(&toto, "MaBite");
   circbuff_write(&toto, "to");
-  printf("In circ buff [%s] \n", circbuff_read(&toto));
-  printf("In circ buff [%s] \n", circbuff_read(&toto));
+  printf("In circ buff [%s] = MaBite\n", circbuff_read(&toto));
+  printf("In circ buff [%s] = to\n", circbuff_read(&toto));
+
+  circbuff_write(&toto, "MaBite");
+  circbuff_write(&toto, "tot");
+  printf("In circ buff [%s] = aBite\n", circbuff_read(&toto));
+  printf("In circ buff [%s] = tot\n", circbuff_read(&toto));
 }
