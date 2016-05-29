@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 16 10:41:14 2016 Julien Karst
-** Last update Sun May 29 22:18:53 2016 
+** Last update Sun May 29 23:28:28 2016 
 */
 
 #include "irc.h"
@@ -114,10 +114,22 @@ void	cmd_nick(int fd, t_channel *chan, fd_set *fd_write, char *nick)
 
 void	cmd_list(int fd, t_channel *chan, fd_set *fd_write, char *arg_one)
 {
-  (void) fd;
-  (void) chan;
+  t_channel	*tmp;
+
+  tmp = chan;
   (void) fd_write;
   (void) arg_one;
+  while (tmp->root == 0)
+     tmp = tmp->next;
+  tmp = tmp->next;
+  dprintf(fd, "321 %s Channel :Users  Name\r\n", chan->nick[fd]);
+  while (tmp->root == 0)
+    {
+      if (tmp->name)
+	dprintf(fd, "322 %s %s 1 :\r\n", chan->nick[fd], tmp->name);
+      tmp = tmp->next;
+    }
+  dprintf(fd, "323 %s :End of /LIST\r\n", chan->nick[fd]);
 }
 
 int	        join_channel_exist(t_channel *chan, char *channel, int fd)
@@ -163,8 +175,6 @@ void	        join_set_channel(t_channel *chan, char *channel, int fd)
 
 void	cmd_join(int fd, t_channel *chan, fd_set *fd_write, char *chan_name)
 {
-  char	*msg;
-
   (void) fd_write;
   if (chan_name == NULL)
     dprintf(fd, "461 * NICK :Not enough parameters\r\n");
@@ -179,18 +189,12 @@ void	cmd_join(int fd, t_channel *chan, fd_set *fd_write, char *chan_name)
 	{
 	  create_channel(chan, chan->port, chan_name);
 	  join_set_channel(chan, chan_name, fd);
-	  msg = malloc(110 + (4 * strlen(chan_name)) + (5 * strlen(chan->nick[fd])));
-	  if (msg == NULL)
-	    exit(42);
-	  sprintf(msg, ":%s!~%s@localhost JOIN :%s\r\n"
+	  dprintf(fd, ":%s!~%s@localhost JOIN :%s\r\n"
 		  "MODE %s +nt\r\n"
 		  "353 %s = %s :@%s\r\n"
 		  "366 %s %s :End of /NAMES list.\r\n", chan->nick[fd]
 		  , chan->nick[fd], chan_name, chan_name, chan->nick[fd],
-		  chan_name, chan->nick[fd], chan->nick[fd], chan_name
-		  );
-	  dprintf(fd, msg);
-	  free(msg);
+		  chan_name, chan->nick[fd], chan->nick[fd], chan_name);
 	}
     }
 }
