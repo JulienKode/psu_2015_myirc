@@ -5,7 +5,7 @@
 ** Login   <malot_k@epitech.net>
 **
 ** Started on  Wed Mar 18 16:58:42 2015 kevin malot
-** Last update Tue Apr  7 14:03:59 2015 kevin malot
+** Last update Sun May 29 22:19:09 2016 
 */
 
 #include <stdlib.h>
@@ -34,7 +34,7 @@ void		create_channel(t_channel *root, int port, char *name)
   elem->root = 0;
   elem->port = port;
   memset(elem->fd_type, FD_FREE, MAX_FD);
-  root->name = strdup(name);
+  elem->name = strdup(name);
   elem->prev = root->prev;
   elem->next = root;
   root->prev->next = elem;
