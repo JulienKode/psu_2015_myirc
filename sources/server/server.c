@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 16 10:41:14 2016 Julien Karst
-** Last update Mon May 16 10:41:59 2016
+** Last update Sun May 29 22:18:53 2016 
 */
 
 #include "irc.h"
@@ -107,6 +107,7 @@ void	cmd_nick(int fd, t_channel *chan, fd_set *fd_write, char *nick)
       msg = strcat(msg, " NICK ");
       msg = strcat(msg, nick);
       global_message(chan, msg);
+      nick[strlen(nick) - 1] = 0;
       chan->nick[fd] = strdup(nick);
     }
 }
@@ -119,12 +120,79 @@ void	cmd_list(int fd, t_channel *chan, fd_set *fd_write, char *arg_one)
   (void) arg_one;
 }
 
-void	cmd_join(int fd, t_channel *chan, fd_set *fd_write, char *arg_one)
+int	        join_channel_exist(t_channel *chan, char *channel, int fd)
 {
+  t_channel	*tmp;
+  int		i;
+
+  i = 0;
   (void) fd;
-  (void) chan;
+  tmp = chan;
+  while (tmp->root == 0)
+     tmp = tmp->next;
+  tmp = tmp->next;
+  while (tmp->root == 0)
+    {
+      if (tmp->name && strcmp(tmp->name, channel) == 0)
+	  i = 1;
+      tmp = tmp->next;
+    }
+  return (i);
+}
+
+void	        join_set_channel(t_channel *chan, char *channel, int fd)
+{
+  t_channel	*tmp;
+
+  tmp = chan;
+  while (tmp->root == 0)
+     tmp = tmp->next;
+  tmp = tmp->next;
+  while (tmp->root == 0)
+    {
+      if (strcmp(tmp->name, channel) == 0)
+	{
+	  tmp->nick[fd] = chan->nick[fd];
+	  tmp->fd_type[fd] = chan->fd_type[fd];
+	  tmp->fct_read[fd] = chan->fct_read[fd];
+	  chan->fd_type[fd] = FD_FREE;
+	}
+      tmp = tmp->next;
+    }
+}
+
+void	cmd_join(int fd, t_channel *chan, fd_set *fd_write, char *chan_name)
+{
+  char	*msg;
+
   (void) fd_write;
-  (void) arg_one;
+  if (chan_name == NULL)
+    dprintf(fd, "461 * NICK :Not enough parameters\r\n");
+  else if (chan_name[0] != '#')
+    dprintf(fd, "433 * %s :Illegal channel name\r\n", chan_name);
+  else
+    {
+      chan_name[strlen(chan_name) - 1] = 0;
+      if (join_channel_exist(chan, chan_name, fd) == 1)
+	join_set_channel(chan, chan_name, fd);
+      else
+	{
+	  create_channel(chan, chan->port, chan_name);
+	  join_set_channel(chan, chan_name, fd);
+	  msg = malloc(110 + (4 * strlen(chan_name)) + (5 * strlen(chan->nick[fd])));
+	  if (msg == NULL)
+	    exit(42);
+	  sprintf(msg, ":%s!~%s@localhost JOIN :%s\r\n"
+		  "MODE %s +nt\r\n"
+		  "353 %s = %s :@%s\r\n"
+		  "366 %s %s :End of /NAMES list.\r\n", chan->nick[fd]
+		  , chan->nick[fd], chan_name, chan_name, chan->nick[fd],
+		  chan_name, chan->nick[fd], chan->nick[fd], chan_name
+		  );
+	  dprintf(fd, msg);
+	  free(msg);
+	}
+    }
 }
 
 void	cmd_part(int fd, t_channel *chan, fd_set *fd_write, char *arg_one)
