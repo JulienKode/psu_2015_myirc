@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 16 10:41:14 2016 Julien Karst
-** Last update Sun May 29 23:28:28 2016 
+** Last update Sun May 29 23:38:35 2016 
 */
 
 #include "irc.h"
@@ -125,7 +125,9 @@ void	cmd_list(int fd, t_channel *chan, fd_set *fd_write, char *arg_one)
   dprintf(fd, "321 %s Channel :Users  Name\r\n", chan->nick[fd]);
   while (tmp->root == 0)
     {
-      if (tmp->name)
+      if (arg_one && tmp->name && strstr(tmp->name, arg_one) != NULL)
+	dprintf(fd, "322 %s %s 1 :\r\n", chan->nick[fd], tmp->name);
+      else if (tmp->name && arg_one == NULL)
 	dprintf(fd, "322 %s %s 1 :\r\n", chan->nick[fd], tmp->name);
       tmp = tmp->next;
     }
