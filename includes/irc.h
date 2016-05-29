@@ -15,7 +15,7 @@
 #define	FD_CLIENT 1
 #define FD_SERVER 2
 #define MAX_FD 255
-#define CMD_NUMBER 8
+#define CMD_NUMBER 9
 
 #include <sys/select.h>
 #include <sys/time.h>
@@ -42,6 +42,7 @@ typedef struct		s_channel
   char			fd_type[MAX_FD];
   fct			fct_read[MAX_FD];
   fct			fct_write[MAX_FD];
+  char			*nick[MAX_FD];
 }			t_channel;
 
 typedef struct		s_cmd
@@ -51,6 +52,7 @@ typedef struct		s_cmd
 }			t_cmd;
 
 void			cmd_nick(int, t_channel *, fd_set *, char *);
+void			cmd_quit(int, t_channel *, fd_set *, char *);
 void			cmd_list(int, t_channel *, fd_set *, char *);
 void			cmd_join(int, t_channel *, fd_set *, char *);
 void			cmd_part(int, t_channel *, fd_set *, char *);

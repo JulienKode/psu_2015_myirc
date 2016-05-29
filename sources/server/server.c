@@ -20,14 +20,95 @@ t_cmd                   cmds[] =
     {"MSG", &cmd_msg},
     {"SEND_FILE", &cmd_send},
     {"ACCEPT_FILE", &cmd_accept},
+    {"QUIT", &cmd_quit},
   };
 
-void	cmd_nick(int fd, t_channel *chan, fd_set *fd_write, char *arg_one)
+void		global_message(t_channel *chan, char *msg)
 {
-  (void) fd;
-  (void) chan;
+  t_channel	*tmp;
+  int		i;
+
+  tmp = chan;
+  while (tmp->root == 0)
+     tmp = tmp->next;
+  tmp = tmp->next;
+  while (tmp->root == 0)
+    {
+      i = 0;
+      while (i < MAX_FD)
+	{
+	  if (tmp->fd_type[i] == FD_CLIENT && FD_ISSET(i, &(tmp->fd_write)))
+	    dprintf(i, ":%s\r\n", msg);
+	  i++;
+	}
+      tmp = tmp->next;
+    }
+  free(msg);
+}
+
+int		nick_exists(t_channel *chan, char *nick)
+{
+  t_channel	*tmp;
+  int		i;
+
+  tmp = chan;
+  while (tmp->root == 0)
+     tmp = tmp->next;
+  tmp = tmp->next;
+  while (tmp->root == 0)
+    {
+      i = 0;
+      while (i < MAX_FD)
+	{
+	  if (tmp->nick && tmp->nick[i] && strcmp(tmp->nick[i], nick) == 0)
+	    return (1);
+	  i++;
+	}
+      tmp = tmp->next;
+    }
+  return (0);
+}
+
+void	cmd_quit(int fd, t_channel *chan, fd_set *fd_write, char *reason)
+{
+  char	*msg;
+
   (void) fd_write;
-  (void) arg_one;
+  if (reason != NULL)
+    msg = malloc(strlen(chan->nick[fd]) + 8 + strlen(reason));
+  else
+    msg = malloc(strlen(chan->nick[fd]) + 8);
+  if (msg == NULL)
+    exit(42);
+  msg = strcpy(msg, chan->nick[fd]);
+  msg = strcat(msg, " QUIT ");
+  close(fd);
+  chan->fd_type[fd] = FD_FREE;
+  if (reason != NULL)
+    msg = strcat(msg, reason);
+  global_message(chan, msg);
+}
+
+void	cmd_nick(int fd, t_channel *chan, fd_set *fd_write, char *nick)
+{
+  char	*msg;
+
+  (void) fd_write;
+  if (nick == NULL)
+    dprintf(fd, "431 * NICK :No nickname given\r\n");
+  else if (nick_exists(chan, nick))
+    dprintf(fd, "433 * %s :Nickname is already in use\r\n", nick);
+  else
+    {
+      msg = malloc(7 + strlen(chan->nick[fd]) + strlen(nick));
+      if (msg == NULL)
+	exit(42);
+      msg = strcpy(msg, chan->nick[fd]);
+      msg = strcat(msg, " NICK ");
+      msg = strcat(msg, nick);
+      global_message(chan, msg);
+      chan->nick[fd] = strdup(nick);
+    }
 }
 
 void	cmd_list(int fd, t_channel *chan, fd_set *fd_write, char *arg_one)
@@ -91,10 +172,9 @@ void			send_message(char *buf, t_channel *chan, int fd,
 {
   int			i;
 
-  // Il faudra également s'assurer que i est dans le même channel que fd
   for (i = 0; i < MAX_FD; i++)
     if (i != fd && chan->fd_type[i] == FD_CLIENT && FD_ISSET(i, fd_write))
-      dprintf(i, "%s\n", buf);
+      dprintf(i, "%s\r\n", buf);
 }
 
 void			parse_cmd(char *buf, t_channel *chan, int fd, fd_set *fd_write)
@@ -103,7 +183,9 @@ void			parse_cmd(char *buf, t_channel *chan, int fd, fd_set *fd_write)
   char			*arg_one;
   int			i;
   int			valid;
+  char			*buf_tmp;
 
+  buf_tmp = strdup(buf);
   cmd = strtok(buf, " \t");
   arg_one = strtok(NULL, " \t");
   i = 0;
@@ -118,7 +200,7 @@ void			parse_cmd(char *buf, t_channel *chan, int fd, fd_set *fd_write)
       i++;
     }
   if (valid == 0)
-    send_message(buf, chan, fd, fd_write);
+    send_message(buf_tmp, chan, fd, fd_write);
 }
 
 void			client_read(t_channel *chan, int fd, fd_set *fd_read,
@@ -136,12 +218,12 @@ void			client_read(t_channel *chan, int fd, fd_set *fd_read,
   if ((size = getline(&buf, &n, fp)) > 0)
     {
       buf[size - 1] = 0;
-      printf("Envoyé depuis le client : %s\n", buf);
+      printf("Envoyé depuis le client : %s\r\n", buf); // A retirer
       parse_cmd(buf, chan, fd, fd_write);
     }
   else
     {
-      printf("Connection closed\n");
+      printf("Connection closed\r\n"); // A modifier
       fclose(fp);
       close(fd);
       chan->fd_type[fd] = FD_FREE;
@@ -160,6 +242,15 @@ void			add_client(t_channel *chan, int s)
   chan->fd_type[cs] = FD_CLIENT;
   chan->fct_read[cs] = client_read;
   chan->fct_write[cs] = NULL;
+  chan->nick[cs] = strdup("Anonymous");
+  dprintf(cs, ":irc.localhost 001 Anonymous :Welcome to the Internet Relay"
+	  " Network Anonymous!~nobody@127.0.0.1\r\n"
+	  ":irc.localhost 002 Anonymous :Your host is irc.localhost, "
+	  "running version 1.0\r\n"
+	  ":irc.localhost 003 Anonymous :This server was created Sun May "
+	  "29 at 14:00:00\r\n"
+	  ":irc.localhost 004 Anonymous :irc.localhost 1.0 aoOirw "
+	  "abeiIklmnoOpqrsRstv\r\n");
 }
 
 void			server_read(t_channel *chan, int fd, fd_set *fd_read,
