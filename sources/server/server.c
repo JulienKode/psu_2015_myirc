@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 16 10:41:14 2016 Julien Karst
-** Last update Mon May 30 18:28:44 2016 
+** Last update Mon May 30 21:09:08 2016 
 */
 
 #include "irc.h"
@@ -22,42 +22,6 @@ t_cmd                   cmds[] =
     {"ACCEPT_FILE", &cmd_accept},
     {"QUIT", &cmd_quit},
   };
-
-void		global_message(t_channel *chan, char *msg)
-{
-  t_channel	*tmp;
-  int		i;
-
-  tmp = chan;
-  while (tmp->root == 0)
-     tmp = tmp->next;
-  tmp = tmp->next;
-  while (tmp->root == 0)
-    {
-      i = 0;
-      while (i < MAX_FD)
-	{
-	  if (tmp->fd_type[i] == FD_CLIENT && FD_ISSET(i, &(tmp->fd_write)))
-	    dprintf(i, ":%s\r\n", msg);
-	  i++;
-	}
-      tmp = tmp->next;
-    }
-  free(msg);
-}
-
-void		chan_message(t_channel *chan, char *msg)
-{
-  int		i;
-
-  i = 0;
-  while (i < MAX_FD)
-    {
-      if (chan->fd_type[i] == FD_CLIENT && FD_ISSET(i, &(chan->fd_write)))
-	dprintf(i, ":%s\r\n", msg);
-      i++;
-    }
-}
 
 int		nick_exists(t_channel *chan, char *nick)
 {
