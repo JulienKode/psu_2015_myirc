@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 16 10:41:14 2016 Julien Karst
-** Last update Sun May 29 23:38:35 2016 
+** Last update Mon May 30 18:28:44 2016 
 */
 
 #include "irc.h"
@@ -44,6 +44,19 @@ void		global_message(t_channel *chan, char *msg)
       tmp = tmp->next;
     }
   free(msg);
+}
+
+void		chan_message(t_channel *chan, char *msg)
+{
+  int		i;
+
+  i = 0;
+  while (i < MAX_FD)
+    {
+      if (chan->fd_type[i] == FD_CLIENT && FD_ISSET(i, &(chan->fd_write)))
+	dprintf(i, ":%s\r\n", msg);
+      i++;
+    }
 }
 
 int		nick_exists(t_channel *chan, char *nick)
@@ -219,10 +232,12 @@ void	cmd_users(int fd, t_channel *chan, fd_set *fd_write, char *arg_one)
 
 void	cmd_msg(int fd, t_channel *chan, fd_set *fd_write, char *arg_one)
 {
+  chan_message(chan, "Tu est sur le channel\r\n");
   (void) fd;
   (void) chan;
   (void) fd_write;
   (void) arg_one;
+
 }
 
 void	cmd_send(int fd, t_channel *chan, fd_set *fd_write, char *arg_one)
