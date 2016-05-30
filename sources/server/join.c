@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 30 18:14:50 2016
-** Last update Mon May 30 18:16:26 2016 
+** Last update Mon May 30 21:22:15 2016 
 */
 
 #include	"irc.h"
@@ -13,7 +13,7 @@
 int		join_channel_exist(t_channel *chan, char *channel, int fd)
 {
   t_channel	*tmp;
-  inti;
+  int		i;
 
   i = 0;
   (void) fd;

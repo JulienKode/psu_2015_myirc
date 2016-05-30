@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 30 18:16:50 2016
-** Last update Mon May 30 18:17:55 2016 
+** Last update Mon May 30 21:18:56 2016 
 */
 
 #include	"irc.h"
@@ -33,4 +33,27 @@ void		cmd_nick
       nick[strlen(nick) - 1] = 0;
       chan->nick[fd] = strdup(nick);
     }
+}
+
+int		nick_exists(t_channel *chan, char *nick)
+{
+  t_channel	*tmp;
+  int		i;
+
+  tmp = chan;
+  while (tmp->root == 0)
+    tmp = tmp->next;
+  tmp = tmp->next;
+  while (tmp->root == 0)
+    {
+      i = 0;
+      while (i < MAX_FD)
+	{
+	  if (tmp->nick && tmp->nick[i] && strcmp(tmp->nick[i], nick) == 0)
+	    return (1);
+	  i++;
+	}
+      tmp = tmp->next;
+    }
+  return (0);
 }

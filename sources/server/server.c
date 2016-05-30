@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 16 10:41:14 2016 Julien Karst
-** Last update Mon May 30 21:09:08 2016 
+** Last update Mon May 30 21:19:50 2016 
 */
 
 #include "irc.h"
@@ -22,29 +22,6 @@ t_cmd                   cmds[] =
     {"ACCEPT_FILE", &cmd_accept},
     {"QUIT", &cmd_quit},
   };
-
-int		nick_exists(t_channel *chan, char *nick)
-{
-  t_channel	*tmp;
-  int		i;
-
-  tmp = chan;
-  while (tmp->root == 0)
-     tmp = tmp->next;
-  tmp = tmp->next;
-  while (tmp->root == 0)
-    {
-      i = 0;
-      while (i < MAX_FD)
-	{
-	  if (tmp->nick && tmp->nick[i] && strcmp(tmp->nick[i], nick) == 0)
-	    return (1);
-	  i++;
-	}
-      tmp = tmp->next;
-    }
-  return (0);
-}
 
 void	cmd_quit(int fd, t_channel *chan, fd_set *fd_write, char *reason)
 {
@@ -64,29 +41,6 @@ void	cmd_quit(int fd, t_channel *chan, fd_set *fd_write, char *reason)
   if (reason != NULL)
     msg = strcat(msg, reason);
   global_message(chan, msg);
-}
-
-void	cmd_nick(int fd, t_channel *chan, fd_set *fd_write, char *nick)
-{
-  char	*msg;
-
-  (void) fd_write;
-  if (nick == NULL)
-    dprintf(fd, "431 * NICK :No nickname given\r\n");
-  else if (nick_exists(chan, nick))
-    dprintf(fd, "433 * %s :Nickname is already in use\r\n", nick);
-  else
-    {
-      msg = malloc(7 + strlen(chan->nick[fd]) + strlen(nick));
-      if (msg == NULL)
-	exit(42);
-      msg = strcpy(msg, chan->nick[fd]);
-      msg = strcat(msg, " NICK ");
-      msg = strcat(msg, nick);
-      global_message(chan, msg);
-      nick[strlen(nick) - 1] = 0;
-      chan->nick[fd] = strdup(nick);
-    }
 }
 
 void	cmd_list(int fd, t_channel *chan, fd_set *fd_write, char *arg_one)
@@ -109,73 +63,6 @@ void	cmd_list(int fd, t_channel *chan, fd_set *fd_write, char *arg_one)
       tmp = tmp->next;
     }
   dprintf(fd, "323 %s :End of /LIST\r\n", chan->nick[fd]);
-}
-
-int	        join_channel_exist(t_channel *chan, char *channel, int fd)
-{
-  t_channel	*tmp;
-  int		i;
-
-  i = 0;
-  (void) fd;
-  tmp = chan;
-  while (tmp->root == 0)
-     tmp = tmp->next;
-  tmp = tmp->next;
-  while (tmp->root == 0)
-    {
-      if (tmp->name && strcmp(tmp->name, channel) == 0)
-	  i = 1;
-      tmp = tmp->next;
-    }
-  return (i);
-}
-
-void	        join_set_channel(t_channel *chan, char *channel, int fd)
-{
-  t_channel	*tmp;
-
-  tmp = chan;
-  while (tmp->root == 0)
-     tmp = tmp->next;
-  tmp = tmp->next;
-  while (tmp->root == 0)
-    {
-      if (strcmp(tmp->name, channel) == 0)
-	{
-	  tmp->nick[fd] = chan->nick[fd];
-	  tmp->fd_type[fd] = chan->fd_type[fd];
-	  tmp->fct_read[fd] = chan->fct_read[fd];
-	  chan->fd_type[fd] = FD_FREE;
-	}
-      tmp = tmp->next;
-    }
-}
-
-void	cmd_join(int fd, t_channel *chan, fd_set *fd_write, char *chan_name)
-{
-  (void) fd_write;
-  if (chan_name == NULL)
-    dprintf(fd, "461 * NICK :Not enough parameters\r\n");
-  else if (chan_name[0] != '#')
-    dprintf(fd, "433 * %s :Illegal channel name\r\n", chan_name);
-  else
-    {
-      chan_name[strlen(chan_name) - 1] = 0;
-      if (join_channel_exist(chan, chan_name, fd) == 1)
-	join_set_channel(chan, chan_name, fd);
-      else
-	{
-	  create_channel(chan, chan->port, chan_name);
-	  join_set_channel(chan, chan_name, fd);
-	  dprintf(fd, ":%s!~%s@localhost JOIN :%s\r\n"
-		  "MODE %s +nt\r\n"
-		  "353 %s = %s :@%s\r\n"
-		  "366 %s %s :End of /NAMES list.\r\n", chan->nick[fd]
-		  , chan->nick[fd], chan_name, chan_name, chan->nick[fd],
-		  chan_name, chan->nick[fd], chan->nick[fd], chan_name);
-	}
-    }
 }
 
 void	cmd_part(int fd, t_channel *chan, fd_set *fd_write, char *arg_one)
