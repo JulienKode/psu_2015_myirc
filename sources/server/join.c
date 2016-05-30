@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 30 18:14:50 2016
-** Last update Mon May 30 21:22:15 2016 
+** Last update Mon May 30 21:37:34 2016 
 */
 
 #include	"irc.h"
@@ -32,6 +32,7 @@ int		join_channel_exist(t_channel *chan, char *channel, int fd)
 
 void		join_set_channel(t_channel *chan, char *channel, int fd)
 {
+  char		*msg;
   t_channel	*tmp;
 
   tmp = chan;
@@ -42,10 +43,15 @@ void		join_set_channel(t_channel *chan, char *channel, int fd)
     {
       if (strcmp(tmp->name, channel) == 0)
 	{
+	  msg = malloc((21 + (2*strlen(tmp->nick[fd]))
+			+ strlen(channel)) * sizeof(char));
+	  sprintf(msg, ":%s!~%s@localhost JOIN :%s",
+		  tmp->nick[fd], tmp->nick[fd], channel);
 	  tmp->nick[fd] = chan->nick[fd];
 	  tmp->fd_type[fd] = chan->fd_type[fd];
 	  tmp->fct_read[fd] = chan->fct_read[fd];
 	  chan->fd_type[fd] = FD_FREE;
+	  chan_message(tmp, msg);
 	}
       tmp = tmp->next;
     }
