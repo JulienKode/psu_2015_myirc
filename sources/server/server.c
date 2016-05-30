@@ -1,11 +1,15 @@
 /*
-** main.c for  in /home/karst_j/PSU_2015_myirc/sources
+1;2802;0c1;2802;0c** main.c for  in /home/karst_j/PSU_2015_myirc/sources
 **
 ** Made by Julien Karst
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 16 10:41:14 2016 Julien Karst
-** Last update Mon May 30 21:19:50 2016 
+<<<<<<< Updated upstream
+** Last update Mon May 30 21:19:50 2016
+=======
+** Last update Mon May 30 18:28:44 2016
+>>>>>>> Stashed changes
 */
 
 #include "irc.h"
@@ -23,33 +27,12 @@ t_cmd                   cmds[] =
     {"QUIT", &cmd_quit},
   };
 
-void	cmd_quit(int fd, t_channel *chan, fd_set *fd_write, char *reason)
-{
-  char	*msg;
-
-  (void) fd_write;
-  if (reason != NULL)
-    msg = malloc(strlen(chan->nick[fd]) + 8 + strlen(reason));
-  else
-    msg = malloc(strlen(chan->nick[fd]) + 8);
-  if (msg == NULL)
-    exit(42);
-  msg = strcpy(msg, chan->nick[fd]);
-  msg = strcat(msg, " QUIT ");
-  close(fd);
-  chan->fd_type[fd] = FD_FREE;
-  if (reason != NULL)
-    msg = strcat(msg, reason);
-  global_message(chan, msg);
-}
-
 void	cmd_list(int fd, t_channel *chan, fd_set *fd_write, char *arg_one)
 {
   t_channel	*tmp;
 
   tmp = chan;
   (void) fd_write;
-  (void) arg_one;
   while (tmp->root == 0)
      tmp = tmp->next;
   tmp = tmp->next;
@@ -63,14 +46,6 @@ void	cmd_list(int fd, t_channel *chan, fd_set *fd_write, char *arg_one)
       tmp = tmp->next;
     }
   dprintf(fd, "323 %s :End of /LIST\r\n", chan->nick[fd]);
-}
-
-void	cmd_part(int fd, t_channel *chan, fd_set *fd_write, char *arg_one)
-{
-  (void) fd;
-  (void) chan;
-  (void) fd_write;
-  (void) arg_one;
 }
 
 void	cmd_users(int fd, t_channel *chan, fd_set *fd_write, char *arg_one)
@@ -107,16 +82,6 @@ void	cmd_accept(int fd, t_channel *chan, fd_set *fd_write, char *arg_one)
   (void) arg_one;
 }
 
-void			send_message(char *buf, t_channel *chan, int fd,
-				     fd_set *fd_write)
-{
-  int			i;
-
-  for (i = 0; i < MAX_FD; i++)
-    if (i != fd && chan->fd_type[i] == FD_CLIENT && FD_ISSET(i, fd_write))
-      dprintf(i, "%s\r\n", buf);
-}
-
 void			parse_cmd(char *buf, t_channel *chan, int fd, fd_set *fd_write)
 {
   char			*cmd;
@@ -130,6 +95,10 @@ void			parse_cmd(char *buf, t_channel *chan, int fd, fd_set *fd_write)
   arg_one = strtok(NULL, " \t");
   i = 0;
   valid = 0;
+  if (arg_one)
+    arg_one[strlen(arg_one) - 1] = 0;
+  else
+    cmd[strlen(cmd) - 1] = 0;
   while (i < CMD_NUMBER)
     {
       if (cmd && strcmp(cmds[i].name, cmd) == 0)
@@ -140,7 +109,7 @@ void			parse_cmd(char *buf, t_channel *chan, int fd, fd_set *fd_write)
       i++;
     }
   if (valid == 0)
-    send_message(buf_tmp, chan, fd, fd_write);
+    chan_message(chan, buf_tmp);
 }
 
 void			client_read(t_channel *chan, int fd, fd_set *fd_read,
@@ -234,7 +203,6 @@ int			main(int ac, char **argv)
     }
   chan = init_list();
   create_channel(chan, atoi(argv[1]), "Accueil");
-  create_channel(chan, atoi(argv[1]), "Global");
   add_server(chan);
   tv.tv_sec = 0;
   tv.tv_usec = 0;

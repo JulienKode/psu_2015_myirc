@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 30 18:16:50 2016
-** Last update Mon May 30 21:18:56 2016 
+** Last update Mon May 30 18:17:55 2016
 */
 
 #include	"irc.h"
@@ -30,7 +30,6 @@ void		cmd_nick
       msg = strcat(msg, " NICK ");
       msg = strcat(msg, nick);
       global_message(chan, msg);
-      nick[strlen(nick) - 1] = 0;
       chan->nick[fd] = strdup(nick);
     }
 }

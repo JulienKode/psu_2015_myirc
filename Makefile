@@ -20,7 +20,8 @@ SRC_SERVER	= 	sources/server/server.c \
 			sources/utils/list.c 	\
 			sources/server/send.c	\
 			sources/server/nick.c	\
-			sources/server/join.c
+			sources/server/join.c	\
+			sources/server/quit.c
 
 SRC_CLIENT	= sources/server/client.c
 

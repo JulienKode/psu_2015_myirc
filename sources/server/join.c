@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 30 18:14:50 2016
-** Last update Mon May 30 21:37:34 2016 
+** Last update Mon May 30 21:37:34 2016
 */
 
 #include	"irc.h"
@@ -50,7 +50,7 @@ void		join_set_channel(t_channel *chan, char *channel, int fd)
 	  tmp->nick[fd] = chan->nick[fd];
 	  tmp->fd_type[fd] = chan->fd_type[fd];
 	  tmp->fct_read[fd] = chan->fct_read[fd];
-	  chan->fd_type[fd] = FD_FREE;
+	  /* chan->fd_type[fd] = FD_FREE; */
 	  chan_message(tmp, msg);
 	}
       tmp = tmp->next;
@@ -68,7 +68,6 @@ void		cmd_join
     dprintf(fd, "433 * %s :Illegal channel name\r\n", chan_name);
   else
     {
-      chan_name[strlen(chan_name) - 1] = 0;
       if (join_channel_exist(chan, chan_name, fd) == 1)
 	join_set_channel(chan, chan_name, fd);
       else
