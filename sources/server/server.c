@@ -1,15 +1,11 @@
 /*
-1;2802;0c1;2802;0c** main.c for  in /home/karst_j/PSU_2015_myirc/sources
+** main.c for  in /home/karst_j/PSU_2015_myirc/sources
 **
 ** Made by Julien Karst
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 16 10:41:14 2016 Julien Karst
-<<<<<<< Updated upstream
-** Last update Mon May 30 21:19:50 2016
-=======
-** Last update Mon May 30 18:28:44 2016
->>>>>>> Stashed changes
+** Last update Mon May 30 22:37:57 2016 
 */
 
 #include "irc.h"
@@ -21,32 +17,11 @@ t_cmd                   cmds[] =
     {"JOIN", &cmd_join},
     {"PART", &cmd_part},
     {"USERS", &cmd_users},
-    {"MSG", &cmd_msg},
+    {"PRIVMSG", &cmd_msg},
     {"SEND_FILE", &cmd_send},
     {"ACCEPT_FILE", &cmd_accept},
     {"QUIT", &cmd_quit},
   };
-
-void	cmd_list(int fd, t_channel *chan, fd_set *fd_write, char *arg_one)
-{
-  t_channel	*tmp;
-
-  tmp = chan;
-  (void) fd_write;
-  while (tmp->root == 0)
-     tmp = tmp->next;
-  tmp = tmp->next;
-  dprintf(fd, "321 %s Channel :Users  Name\r\n", chan->nick[fd]);
-  while (tmp->root == 0)
-    {
-      if (arg_one && tmp->name && strstr(tmp->name, arg_one) != NULL)
-	dprintf(fd, "322 %s %s 1 :\r\n", chan->nick[fd], tmp->name);
-      else if (tmp->name && arg_one == NULL)
-	dprintf(fd, "322 %s %s 1 :\r\n", chan->nick[fd], tmp->name);
-      tmp = tmp->next;
-    }
-  dprintf(fd, "323 %s :End of /LIST\r\n", chan->nick[fd]);
-}
 
 void	cmd_users(int fd, t_channel *chan, fd_set *fd_write, char *arg_one)
 {
