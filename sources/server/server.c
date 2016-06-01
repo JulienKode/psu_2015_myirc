@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 16 10:41:14 2016 Julien Karst
-** Last update Mon May 30 22:37:57 2016 
+** Last update Wed Jun  1 21:47:49 2016 
 */
 
 #include "irc.h"
@@ -22,14 +22,6 @@ t_cmd                   cmds[] =
     {"ACCEPT_FILE", &cmd_accept},
     {"QUIT", &cmd_quit},
   };
-
-void	cmd_users(int fd, t_channel *chan, fd_set *fd_write, char *arg_one)
-{
-  (void) fd;
-  (void) chan;
-  (void) fd_write;
-  (void) arg_one;
-}
 
 void	cmd_msg(int fd, t_channel *chan, fd_set *fd_write, char *arg_one)
 {
