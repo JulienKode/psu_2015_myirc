@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 30 18:14:50 2016
-** Last update Tue May 31 20:38:58 2016 
+** Last update Wed Jun  1 22:15:40 2016 
 */
 
 #include	"irc.h"
@@ -72,7 +72,7 @@ void		cmd_join
 	join_set_channel(chan, chan_name, fd);
       else
 	{
-	  create_channel(chan, chan->port, chan_name);
+	  create_channel(chan, chan->port, chan_name, fd);
 	  join_set_channel(chan, chan_name, fd);
 	  dprintf(fd, ":%s!~%s@localhost JOIN :%s\r\n"
 		  "MODE %s +nt\r\n"

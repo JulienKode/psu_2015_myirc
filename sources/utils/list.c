@@ -5,7 +5,7 @@
 ** Login   <malot_k@epitech.net>
 **
 ** Started on  Wed Mar 18 16:58:42 2015 kevin malot
-** Last update Sun May 29 22:19:09 2016 
+** Last update Wed Jun  1 22:32:12 2016 
 */
 
 #include <stdlib.h>
@@ -19,19 +19,21 @@ t_channel	*init_list()
     exit(42);
   root->root = 1;
   root->port = 0;
+  root->creator = 0;
   root->prev = root;
   root->next = root;
   root->name = NULL;
   return (root);
 }
 
-void		create_channel(t_channel *root, int port, char *name)
+void		create_channel(t_channel *root, int port, char *name, int fd)
 {
   t_channel	*elem;
 
   if ((elem = malloc(sizeof(t_channel))) == NULL)
     exit(42);
   elem->root = 0;
+  elem->creator = fd;
   elem->port = port;
   memset(elem->fd_type, FD_FREE, MAX_FD);
   elem->name = strdup(name);
@@ -39,4 +41,23 @@ void		create_channel(t_channel *root, int port, char *name)
   elem->next = root;
   root->prev->next = elem;
   root->prev = elem;
+}
+
+t_channel	*found_channel_by_name(t_channel *chan, char *str)
+{
+  t_channel	*tmp;
+
+  if (chan == NULL)
+    return (NULL);
+  tmp = chan;
+  while (tmp->root == 0)
+    tmp = tmp->next;
+  tmp = tmp->next;
+  while (tmp->root == 0)
+    {
+      if (tmp && strcmp(tmp->name, str) == 0)
+	return (tmp);
+      tmp = tmp->next;
+    }
+  return (NULL);
 }

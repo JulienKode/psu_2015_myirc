@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 16 10:41:14 2016 Julien Karst
-** Last update Wed Jun  1 21:47:49 2016 
+** Last update Wed Jun  1 22:17:29 2016 
 */
 
 #include "irc.h"
@@ -169,7 +169,7 @@ int			main(int ac, char **argv)
       return (1);
     }
   chan = init_list();
-  create_channel(chan, atoi(argv[1]), "Accueil");
+  create_channel(chan, atoi(argv[1]), "Accueil", -1);
   add_server(chan);
   tv.tv_sec = 0;
   tv.tv_usec = 0;

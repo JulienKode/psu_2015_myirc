@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 16 10:40:15 2016 Julien Karst
-** Last update Mon May 30 21:19:19 2016 
+** Last update Wed Jun  1 22:32:48 2016 
 */
 
 #ifndef	IRC_H_
@@ -32,6 +32,7 @@ typedef void		(*fct)();
 
 typedef struct		s_channel
 {
+  int			creator;
   int			root;
   int			port;
   char			*name;
@@ -65,7 +66,8 @@ void			cmd_users(int, t_channel *, fd_set *, char *);
 void			cmd_msg(int, t_channel *, fd_set *, char *);
 void			cmd_send(int, t_channel *, fd_set *, char *);
 void			cmd_accept(int, t_channel *, fd_set *, char *);
-void			create_channel(t_channel *, int, char *);
+void			create_channel(t_channel *, int, char *, int);
+t_channel		*found_channel_by_name(t_channel *, char *);
 t_channel		*init_list();
 
 #endif	/* IRC_H_ */
