@@ -5,7 +5,7 @@
 ** Login   <malot_k@epitech.net>
 **
 ** Started on  Mon May 30 22:04:15 2016 Kevin Malot
-** Last update Thu Jun  2 17:06:10 2016 
+** Last update Thu Jun  2 17:29:38 2016 
 */
 
 #include "irc.h"
@@ -54,7 +54,10 @@ void		join_remove_channel(t_channel *chan, char *channel, int fd)
 	      tmp->fd_type[fd] = FD_FREE;
 	      msg = malloc(7 + strlen(chan->nick[fd]) + strlen(channel));
 	      if (msg == NULL)
-		exit(42);
+		{
+		  close(fd);
+		  chan->fd_type[fd] = FD_FREE;
+		}
 	      msg = strcpy(msg, chan->nick[fd]);
 	      msg = strcat(msg, " PART ");
 	      msg = strcat(msg, channel);
