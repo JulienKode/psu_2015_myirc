@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 16 10:40:15 2016 Julien Karst
-** Last update Fri Jun  3 00:00:00 2016 
+** Last update Fri Jun  3 00:38:40 2016 
 */
 
 #ifndef	IRC_H_
@@ -15,7 +15,7 @@
 #define	FD_CLIENT 1
 #define FD_SERVER 2
 #define MAX_FD 255
-#define CMD_NUMBER 9
+#define CMD_NUMBER 10
 
 #include <sys/select.h>
 #include <sys/time.h>
@@ -67,6 +67,7 @@ void			cmd_users(int, t_channel *, fd_set *, char *);
 void			cmd_msg(int, t_channel *, fd_set *, char *);
 void			cmd_send(int, t_channel *, fd_set *, char *);
 void			cmd_accept(int, t_channel *, fd_set *, char *);
+void			cmd_names(int, t_channel *, fd_set *, char *);
 void			create_channel(t_channel *, int, char *, int);
 t_channel		*found_channel_by_name(t_channel *, char *);
 t_channel		*init_list();
