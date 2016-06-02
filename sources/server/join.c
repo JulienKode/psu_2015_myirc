@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 30 18:14:50 2016
-** Last update Fri Jun  3 00:14:32 2016 
+** Last update Fri Jun  3 00:22:00 2016 
 */
 
 #include	"irc.h"
@@ -35,18 +35,16 @@ static void	join_c(int fd, t_channel *chan, char *chan_name, int c)
   if (chan->join[fd] == 0 && c != 0)
     {
       chan->join[fd] = 1;
-      //      dprintf(fd, ":%s!~%s@localhost JOIN :%s\r\n",
-      //	      chan->nick[fd] , chan->nick[fd], chan_name);
+      dprintf(fd, ":%s!~%s@localhost JOIN :%s\r\n",
+	      chan->nick[fd] , chan->nick[fd], chan_name);
       if (c == 1)
 	{
-	  printf("ICI \n");
 	  dprintf(fd, ":irc.localhost MODE %s +nt\r\n"
 		  ":irc.localhost 353 %s = %s :@%s",
 		  chan_name, chan->nick[fd], chan_name, chan->nick[fd]);
 	}
       else
 	{
-	  printf("ICI \n");
 	  dprintf(fd, ":irc.localhost 353 %s = %s :%s",
 		  chan->nick[fd], chan_name, chan->nick[fd]);
 	  while (++c < MAX_FD)
@@ -108,12 +106,6 @@ void		cmd_join
 	{
 	  create_channel(chan, chan->port, chan_name, fd);
 	  join_set_channel(chan, chan_name, fd, 1);
-	  dprintf(fd, ":%s!~%s@localhost JOIN :%s\r\n"
-		  ":irc.localhost MODE %s +nt\r\n"
-		  ":irc.localhost 353 %s = %s :@%s\r\n"
-		  ":irc.localhost 366 %s %s :End of /NAMES list.\r\n", chan->nick[fd]
-		  , chan->nick[fd], chan_name, chan_name, chan->nick[fd],
-		  chan_name, chan->nick[fd], chan->nick[fd], chan_name);
 	}
     }
 }
