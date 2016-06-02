@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 16 10:40:15 2016 Julien Karst
-** Last update Wed Jun  1 22:32:48 2016 
+** Last update Wed Jun  1 22:32:48 2016
 */
 
 #ifndef	IRC_H_
@@ -16,6 +16,7 @@
 #define FD_SERVER 2
 #define MAX_FD 255
 #define CMD_NUMBER 9
+#define CMD_CLIENT_NUMBER 11
 
 #include <sys/select.h>
 #include <sys/time.h>
@@ -27,6 +28,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <netdb.h>
 
 typedef void		(*fct)();
 
@@ -49,8 +51,17 @@ typedef struct		s_channel
 typedef struct		s_cmd
 {
   char			*name;
-  void			(*p)(int, t_channel *, fd_set *, char *);
+  void			(*p)();
 }			t_cmd;
+
+typedef struct		s_client
+{
+  int			fd;
+  fd_set		fd_read;
+  fd_set		fd_write;
+  struct sockaddr_in	sin;
+  socklen_t		len;
+}			t_client;
 
 int			nick_exists(t_channel *, char *);
 void			join_set_channel(t_channel *, char *, int);
@@ -69,5 +80,6 @@ void			cmd_accept(int, t_channel *, fd_set *, char *);
 void			create_channel(t_channel *, int, char *, int);
 t_channel		*found_channel_by_name(t_channel *, char *);
 t_channel		*init_list();
+void			client_server(t_client *, char*, char *);
 
 #endif	/* IRC_H_ */

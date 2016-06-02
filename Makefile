@@ -25,7 +25,7 @@ SRC_SERVER	= 	sources/server/server.c \
 			sources/server/users.c	\
 			sources/server/list.c
 
-SRC_CLIENT	= sources/server/client.c
+SRC_CLIENT	= sources/client/client.c
 
 OBJ_SERVER	= $(SRC_SERVER:.c=.o)
 

@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 16 10:41:14 2016 Julien Karst
-** Last update Wed Jun  1 22:17:29 2016 
+** Last update Wed Jun  1 22:17:29 2016
 */
 
 #include "irc.h"
@@ -120,11 +120,11 @@ void			add_client(t_channel *chan, int s)
   chan->fct_write[cs] = NULL;
   chan->nick[cs] = strdup("Anonymous");
   dprintf(cs, ":irc.localhost 001 Anonymous :Welcome to the Internet Relay"
-	  " Network Anonymous!~nobody@127.0.0.1\r\n"
+	  " Network Anonymous!~nobody@127.0.0.1\n"
 	  ":irc.localhost 002 Anonymous :Your host is irc.localhost, "
-	  "running version 1.0\r\n"
+	  "running version 1.0\n"
 	  ":irc.localhost 003 Anonymous :This server was created Sun May "
-	  "29 at 14:00:00\r\n"
+	  "29 at 14:00:00\n"
 	  ":irc.localhost 004 Anonymous :irc.localhost 1.0 aoOirw "
 	  "abeiIklmnoOpqrsRstv\r\n");
 }
