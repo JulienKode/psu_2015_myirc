@@ -5,7 +5,7 @@
 ** Login   <malot_k@epitech.net>
 **
 ** Started on  Mon May 30 22:04:15 2016 Kevin Malot
-** Last update Mon May 30 22:04:15 2016 Kevin Malot
+** Last update Thu Jun  2 17:06:10 2016 
 */
 
 #include "irc.h"
@@ -48,7 +48,7 @@ void		join_remove_channel(t_channel *chan, char *channel, int fd)
 	{
 	  valid = 1;
 	  if (tmp->fd_type[fd] == FD_FREE)
-	    dprintf(fd, "442 * channel :You're not on that channel !\r\n");
+	    dprintf(fd, ":irc.localhost 442 * channel :You're not on that channel !\r\n");
 	  else
 	    {
 	      tmp->fd_type[fd] = FD_FREE;
@@ -64,7 +64,7 @@ void		join_remove_channel(t_channel *chan, char *channel, int fd)
       tmp = tmp->next;
     }
   if (valid == 0)
-    dprintf(fd, "403 * %s: No such channel\r\n", channel);
+    dprintf(fd, ":irc.localhost 403 * %s: No such channel\r\n", channel);
 }
 
 void		cmd_part(int fd, t_channel *chan, fd_set *fd_write,
@@ -73,9 +73,9 @@ void		cmd_part(int fd, t_channel *chan, fd_set *fd_write,
   (void) fd_write;
   printf("Arg : %s\n", arg_one);
   if (arg_one == NULL)
-    dprintf(fd, "461 * NICK :Not enough parameters\r\n");
+    dprintf(fd, ":irc.localhost 461 * NICK :Not enough parameters\r\n");
   else if (strcmp(arg_one, "Accueil") == 0)
-    dprintf(fd, "403 * Accueil: No such channel\r\n");
+    dprintf(fd, ":irc.localhost 403 * Accueil: No such channel\r\n");
   else
     {
       join_remove_channel(chan, arg_one, fd);

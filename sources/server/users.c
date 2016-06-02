@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 30 21:40:00 2016
-** Last update Mon May 30 22:02:14 2016 
+** Last update Thu Jun  2 17:06:47 2016 
 */
 
 #include	"irc.h"
@@ -39,7 +39,7 @@ void		cmd_users
   (void) arg_one;
   res = nb_of_users(chan, fd);
   dprintf(fd,
-	  "265 to :Current local users: %d  Max: %d\r\n"
-	  "266 to :Current global users: %d  Max: %d\r\n",
+	  ":irc.localhost 265 to :Current local users: %d  Max: %d\r\n"
+	  ":irc.localhost 266 to :Current global users: %d  Max: %d\r\n",
 	  res, res, res, res );
 }
