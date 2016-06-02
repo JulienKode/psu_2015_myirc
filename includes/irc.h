@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 16 10:40:15 2016 Julien Karst
-** Last update Wed Jun  1 22:32:48 2016 
+** Last update Fri Jun  3 00:00:00 2016 
 */
 
 #ifndef	IRC_H_
@@ -40,6 +40,7 @@ typedef struct		s_channel
   struct s_channel	*next;
   fd_set		fd_read;
   fd_set		fd_write;
+  int			join[MAX_FD];
   char			fd_type[MAX_FD];
   fct			fct_read[MAX_FD];
   fct			fct_write[MAX_FD];
@@ -53,7 +54,7 @@ typedef struct		s_cmd
 }			t_cmd;
 
 int			nick_exists(t_channel *, char *);
-void			join_set_channel(t_channel *, char *, int);
+void			join_set_channel(t_channel *, char *, int, int);
 int			join_channel_exist(t_channel *, char *, int);
 void			global_message(t_channel *, char *);
 void			chan_message(t_channel *, char *);
