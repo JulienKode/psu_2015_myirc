@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 16 10:40:15 2016 Julien Karst
-** Last update Fri Jun  3 00:38:40 2016 
+** Last update Fri Jun  3 20:52:43 2016 
 */
 
 #ifndef	IRC_H_
@@ -27,6 +27,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include "utils_circbuff.h"
 
 typedef void		(*fct)();
 
@@ -45,6 +46,7 @@ typedef struct		s_channel
   fct			fct_read[MAX_FD];
   fct			fct_write[MAX_FD];
   char			*nick[MAX_FD];
+  t_circbuff		circbuff[MAX_FD];
 }			t_channel;
 
 typedef struct		s_cmd

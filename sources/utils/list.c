@@ -5,7 +5,7 @@
 ** Login   <malot_k@epitech.net>
 **
 ** Started on  Wed Mar 18 16:58:42 2015 kevin malot
-** Last update Thu Jun  2 22:51:20 2016
+** Last update Fri Jun  3 20:54:41 2016 
 */
 
 #include <stdlib.h>
@@ -28,8 +28,10 @@ t_channel	*init_list()
 
 void		create_channel(t_channel *root, int port, char *name, int fd)
 {
+  int		i;
   t_channel	*elem;
 
+  i = -1;
   if ((elem = malloc(sizeof(t_channel))) == NULL)
     exit(42);
   elem->root = 0;
@@ -37,6 +39,8 @@ void		create_channel(t_channel *root, int port, char *name, int fd)
   elem->port = port;
   memset(elem->fd_type, FD_FREE, MAX_FD);
   memset(elem->join, 0, MAX_FD);
+  while (++i < MAX_FD)
+    elem->circbuff[i] = circbuff_create(1024);
   elem->name = strdup(name);
   elem->prev = root->prev;
   elem->next = root;
