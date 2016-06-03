@@ -5,7 +5,7 @@
 ## Login   <malot_k@epitech.net>
 ## 
 ## Started on  Sun Nov 23 10:06:19 2014 kevin malot
-## Last update Fri Jun  3 20:57:47 2016 
+## Last update Fri Jun  3 21:41:22 2016 
 ##
 
 CFLAGS          += -W -Wall -Wextra -Werror -Iincludes -g
@@ -23,6 +23,7 @@ SRC_SERVER	= 	sources/server/server.c 		\
 			sources/server/join.c			\
 			sources/server/quit.c			\
 			sources/server/names.c			\
+			sources/server/writer.c			\
 			sources/server/users.c			\
 			sources/utils/circbuff/circbuff.c	\
 			sources/server/list.c
