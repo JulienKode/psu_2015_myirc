@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 16 10:41:14 2016 Julien Karst
-** Last update Fri Jun  3 00:38:02 2016
+** Last update Fri Jun  3 19:23:19 2016 
 */
 
 #include "irc.h"
@@ -205,8 +205,11 @@ int			main(int ac, char **argv)
 	  while (chan->root == 0)
 	    {
 	      for (j = 0; j < MAX_FD; j++)
-		if (FD_ISSET(j, &fd_read) && chan->fd_type[j] != FD_FREE)
-		  chan->fct_read[j](chan, j, fd_read, fd_write);
+		{
+		  printf("CHAN [%p] [%s] type[%d] Name[%s] I[%d]\n", chan, chan->name, chan->fd_type[j], chan->nick[j], j);
+		  if (FD_ISSET(j, &fd_read) && chan->fd_type[j] != FD_FREE)
+		    chan->fct_read[j](chan, j, fd_read, fd_write);
+		}
 	      chan = chan->next;
 	    }
 	  /* for (j = 0; j < MAX_FD; j++) */

@@ -5,7 +5,7 @@
 ** Login   <malot_k@epitech.net>
 **
 ** Started on  Mon May 30 22:04:15 2016 Kevin Malot
-** Last update Fri Jun  3 00:03:26 2016
+** Last update Fri Jun  3 19:25:49 2016 
 */
 
 #include "irc.h"
@@ -34,7 +34,8 @@ void		cmd_quit(int fd, t_channel *chan, fd_set *fd_write,
   tmp = tmp->next;
   while (tmp->root == 0)
     {
-      chan->fd_type[fd] = FD_FREE;
+
+      tmp->fd_type[fd] = FD_FREE;
       tmp = tmp->next;
     }
   close(fd);
