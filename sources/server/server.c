@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 16 10:41:14 2016 Julien Karst
-** Last update Fri Jun  3 19:23:19 2016 
+** Last update Fri Jun  3 19:23:19 2016
 */
 
 #include "irc.h"
@@ -56,17 +56,12 @@ void			parse_cmd(char *buf, t_channel *chan, int fd, fd_set *fd_write)
   char			*arg_one;
   int			i;
   int			valid;
-  char			*buf_tmp;
 
-  buf_tmp = strdup(buf);
+  buf[strlen(buf) - 1] = 0;
   cmd = strtok(buf, " \t");
   arg_one = strtok(NULL, " \t");
   i = 0;
   valid = 0;
-  if (arg_one)
-    arg_one[strlen(arg_one) - 1] = 0;
-  else
-    cmd[strlen(cmd) - 1] = 0;
   while (i < CMD_NUMBER)
     {
       if (cmd && strcmp(cmds[i].name, cmd) == 0)
@@ -77,7 +72,7 @@ void			parse_cmd(char *buf, t_channel *chan, int fd, fd_set *fd_write)
       i++;
     }
   if (valid == 0)
-    chan_message(chan, buf_tmp);
+    dprintf(fd, ":irc.localhost %s %s :Unknown command\r\n", chan->nick[fd], cmd);
 }
 
 void			client_read(t_channel *chan, int fd, fd_set *fd_read,
@@ -190,7 +185,7 @@ int			main(int ac, char **argv)
 	{
 	  /* FD_ZERO(&(chan->fd_read)); */
 	  for (i = 0; i < MAX_FD; i++)
-	    if (chan->fd_type[i] != FD_FREE)
+	    if (chan->fd_type[i] == FD_CLIENT)
 	      /*     FD_SET(i, &(chan->fd_read)); */
 	      /* FD_ZERO(&(chan->fd_write)); */
 	      FD_SET(i, &fd_read);
@@ -199,24 +194,27 @@ int			main(int ac, char **argv)
       //for (i = 0; i < MAX_FD; i++)
       //if (chan->fd_type[i] != FD_FREE) et quelque chose dans le buffer circulaire
       //FD_SET(i, &(chan->fd_write));
-	  if (select(MAX_FD + 1, &fd_read, NULL, NULL, NULL) == -1)
-	    return (0);
+      if (select(MAX_FD + 1, &fd_read, NULL, NULL, NULL) == -1)
+	return (0);
+      chan = chan->next;
+      int ok = 0;
+      while (chan->root == 0 && ok == 0)
+	{
+	  for (j = 0; j < MAX_FD; j++)
+	    if (FD_ISSET(j, &fd_read) && chan->fd_type[j] != FD_FREE)
+	      {
+		chan->fct_read[j](chan, j, fd_read, fd_write);
+		ok = 1;
+	      }
 	  chan = chan->next;
-	  while (chan->root == 0)
-	    {
-	      for (j = 0; j < MAX_FD; j++)
-		{
-		  printf("CHAN [%p] [%s] type[%d] Name[%s] I[%d]\n", chan, chan->name, chan->fd_type[j], chan->nick[j], j);
-		  if (FD_ISSET(j, &fd_read) && chan->fd_type[j] != FD_FREE)
-		    chan->fct_read[j](chan, j, fd_read, fd_write);
-		}
-	      chan = chan->next;
-	    }
-	  /* for (j = 0; j < MAX_FD; j++) */
-	  /*   if (FD_ISSET(j, &(chan->fd_write))) */
-	  /*     dprintf(j, "%s", chan->circbuff[j]); */
-	  /* chan = chan->next; */
-	  /* } */
+	}
+      while (chan->root == 0)
+	chan = chan->next;
+      /* for (j = 0; j < MAX_FD; j++) */
+      /*   if (FD_ISSET(j, &(chan->fd_write))) */
+      /*     dprintf(j, "%s", chan->circbuff[j]); */
+      /* chan = chan->next; */
+      /* } */
     }
   return (0);
 }
