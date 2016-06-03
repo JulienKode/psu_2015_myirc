@@ -5,7 +5,7 @@
 ** Login   <malot_k@epitech.net>
 **
 ** Started on  Wed Mar 18 16:58:42 2015 kevin malot
-** Last update Thu Jun  2 22:51:20 2016 
+** Last update Thu Jun  2 22:51:20 2016
 */
 
 #include <stdlib.h>
@@ -42,6 +42,8 @@ void		create_channel(t_channel *root, int port, char *name, int fd)
   elem->next = root;
   root->prev->next = elem;
   root->prev = elem;
+  FD_ZERO(&(elem->fd_write));
+  FD_ZERO(&(elem->fd_read));
 }
 
 t_channel	*found_channel_by_name(t_channel *chan, char *str)

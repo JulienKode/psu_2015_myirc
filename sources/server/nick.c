@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 30 18:16:50 2016
-** Last update Fri Jun  3 00:07:02 2016 
+** Last update Fri Jun  3 00:07:02 2016
 */
 
 #include	"irc.h"
@@ -27,7 +27,7 @@ void		cmd_nick
     {
       msg = malloc(7 + strlen(chan->nick[fd]) + strlen(nick));
       if (msg == NULL)
-	exit(42);
+	return;
       msg = strcpy(msg, chan->nick[fd]);
       msg = strcat(msg, " NICK ");
       msg = strcat(msg, nick);
