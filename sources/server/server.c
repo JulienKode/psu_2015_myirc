@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 16 10:41:14 2016 Julien Karst
-** Last update Fri Jun  3 00:38:02 2016 
+** Last update Fri Jun  3 19:23:19 2016
 */
 
 #include "irc.h"
@@ -56,17 +56,12 @@ void			parse_cmd(char *buf, t_channel *chan, int fd, fd_set *fd_write)
   char			*arg_one;
   int			i;
   int			valid;
-  char			*buf_tmp;
 
-  buf_tmp = strdup(buf);
+  buf[strlen(buf) - 1] = 0;
   cmd = strtok(buf, " \t");
   arg_one = strtok(NULL, " \t");
   i = 0;
   valid = 0;
-  if (arg_one)
-    arg_one[strlen(arg_one) - 1] = 0;
-  else
-    cmd[strlen(cmd) - 1] = 0;
   while (i < CMD_NUMBER)
     {
       if (cmd && strcmp(cmds[i].name, cmd) == 0)
@@ -77,7 +72,7 @@ void			parse_cmd(char *buf, t_channel *chan, int fd, fd_set *fd_write)
       i++;
     }
   if (valid == 0)
-    chan_message(chan, buf_tmp);
+    dprintf(fd, ":irc.localhost %s %s :Unknown command\r\n", chan->nick[fd], cmd);
 }
 
 void			client_read(t_channel *chan, int fd, fd_set *fd_read,
@@ -87,12 +82,13 @@ void			client_read(t_channel *chan, int fd, fd_set *fd_read,
   int			size;
   size_t		n;
   FILE			*fp;
+  char			*msg;
 
   n = 4096;
   fp = fdopen(fd, "r");
   buf = NULL;
   (void) fd_read;
-  if ((size = getline(&buf, &n, fp)) > 0)
+  if ((size = getline(&buf, &n, fp)) > 1)
     {
       buf[size - 1] = 0;
       printf("Envoyé depuis le client : %s\r\n", buf); // A retirer
@@ -100,11 +96,16 @@ void			client_read(t_channel *chan, int fd, fd_set *fd_read,
     }
   else
     {
-      //printf("Connection closed\r\n"); // A modifier
-      //fclose(fp);
-      //close(fd);
-      //chan->fd_type[fd] = FD_FREE;
-      return;
+      msg = malloc(strlen(chan->nick[fd]) + 28);
+      if (msg != NULL)
+	{
+	  msg = strcpy(msg, chan->nick[fd]);
+	  msg = strcat(msg, " QUIT :Disconnected by User");
+	  global_message(chan, msg);
+	}
+      chan->fd_type[fd] = FD_FREE;
+      fclose(fp);
+      close(fd);
     }
 }
 
@@ -128,6 +129,7 @@ void			add_client(t_channel *chan, int s)
 	  "29 at 14:00:00\r\n"
 	  ":irc.localhost 004 Anonymous :irc.localhost 1.0 aoOirw "
 	  "abeiIklmnoOpqrsRstv\r\n");
+  global_message(chan, strdup(":An Anonymous USER joined the server !"));
 }
 
 void			server_read(t_channel *chan, int fd, fd_set *fd_read,
@@ -162,7 +164,8 @@ int			main(int ac, char **argv)
   t_channel		*chan;
   int			i;
   int			j;
-  //  struct timeval	tv;
+  fd_set fd_read;
+  fd_set fd_write;
 
   if (ac != 2)
     {
@@ -172,29 +175,46 @@ int			main(int ac, char **argv)
   chan = init_list();
   create_channel(chan, atoi(argv[1]), "Accueil", -1);
   add_server(chan);
-  //  tv.tv_sec = 0;
-  //  tv.tv_usec = 0;
   while (42)
     {
       chan = chan->next;
+      FD_ZERO(&fd_read);
+      FD_ZERO(&fd_write);
+      FD_SET(3, &fd_read);
       while (chan->root == 0)
 	{
-	  FD_ZERO(&(chan->fd_read));
+	  /* FD_ZERO(&(chan->fd_read)); */
 	  for (i = 0; i < MAX_FD; i++)
-	    if (chan->fd_type[i] != FD_FREE)
-	      FD_SET(i, &(chan->fd_read));
-	  FD_ZERO(&(chan->fd_write));
-	  //for (i = 0; i < MAX_FD; i++)
-	    //
-	  // if (chan->fd_type[i] != FD_FREE)
-	  //  FD_SET(i, &(chan->fd_write));
-	  if (select(MAX_FD, &(chan->fd_read), &(chan->fd_write), NULL, NULL) == -1)
-	    return (0);
-	  for (j = 0; j < MAX_FD; j++)
-	    if (FD_ISSET(j, &(chan->fd_read)))
-	      chan->fct_read[j](chan, j, &(chan->fd_read), &(chan->fd_write));
-      	  chan = chan->next;
+	    if (chan->fd_type[i] == FD_CLIENT)
+	      /*     FD_SET(i, &(chan->fd_read)); */
+	      /* FD_ZERO(&(chan->fd_write)); */
+	      FD_SET(i, &fd_read);
+	  chan = chan->next;
 	}
+      //for (i = 0; i < MAX_FD; i++)
+      //if (chan->fd_type[i] != FD_FREE) et quelque chose dans le buffer circulaire
+      //FD_SET(i, &(chan->fd_write));
+      if (select(MAX_FD + 1, &fd_read, NULL, NULL, NULL) == -1)
+	return (0);
+      chan = chan->next;
+      int ok = 0;
+      while (chan->root == 0 && ok == 0)
+	{
+	  for (j = 0; j < MAX_FD; j++)
+	    if (FD_ISSET(j, &fd_read) && chan->fd_type[j] != FD_FREE)
+	      {
+		chan->fct_read[j](chan, j, fd_read, fd_write);
+		ok = 1;
+	      }
+	  chan = chan->next;
+	}
+      while (chan->root == 0)
+	chan = chan->next;
+      /* for (j = 0; j < MAX_FD; j++) */
+      /*   if (FD_ISSET(j, &(chan->fd_write))) */
+      /*     dprintf(j, "%s", chan->circbuff[j]); */
+      /* chan = chan->next; */
+      /* } */
     }
   return (0);
 }

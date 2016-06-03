@@ -5,7 +5,11 @@
 ** Login   <malot_k@epitech.net>
 **
 ** Started on  Mon May 30 22:04:15 2016 Kevin Malot
-** Last update Fri Jun  3 10:27:09 2016 
+<<<<<<< HEAD
+** Last update Fri Jun  3 20:59:12 2016 
+=======
+** Last update Fri Jun  3 10:27:09 2016
+>>>>>>> remotes/origin/master
 */
 
 #include "irc.h"
@@ -13,20 +17,31 @@
 void		cmd_quit(int fd, t_channel *chan, fd_set *fd_write,
 			 char *reason)
 {
+  t_channel	*tmp;
   char		*msg;
 
   (void) fd_write;
+  tmp = chan;
   if (reason != NULL)
     msg = malloc(strlen(chan->nick[fd]) + 8 + strlen(reason));
   else
     msg = malloc(strlen(chan->nick[fd]) + 8);
+  if (msg == NULL)
+    return;
   msg = strcpy(msg, chan->nick[fd]);
   msg = strcat(msg, " QUIT ");
   if (reason != NULL)
     msg = strcat(msg, reason);
   global_message(chan, msg);
+  while (tmp->root == 0)
+    tmp = tmp->next;
+  tmp = tmp->next;
+  while (tmp->root == 0)
+    {
+      tmp->fd_type[fd] = FD_FREE;
+      tmp = tmp->next;
+    }
   close(fd);
-  chan->fd_type[fd] = FD_FREE;
 }
 
 void		join_remove_channel(t_channel *chan, char *channel, int fd)
@@ -53,10 +68,7 @@ void		join_remove_channel(t_channel *chan, char *channel, int fd)
 	      tmp->fd_type[fd] = FD_FREE;
 	      msg = malloc(7 + strlen(chan->nick[fd]) + strlen(channel));
 	      if (msg == NULL)
-		{
-		  close(fd);
-		  chan->fd_type[fd] = FD_FREE;
-		}
+		return;
 	      msg = strcpy(msg, chan->nick[fd]);
 	      msg = strcat(msg, " PART ");
 	      msg = strcat(msg, channel);

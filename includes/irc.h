@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 16 10:40:15 2016 Julien Karst
-** Last update Fri Jun  3 10:46:00 2016 
+** Last update Fri Jun  3 21:00:17 2016 
 */
 
 #ifndef	IRC_H_
