@@ -5,7 +5,7 @@
 ** Login   <malot_k@epitech.net>
 **
 ** Started on  Mon May 30 22:04:15 2016 Kevin Malot
-** Last update Fri Jun  3 00:03:26 2016 
+** Last update Fri Jun  3 10:27:09 2016 
 */
 
 #include "irc.h"
@@ -20,15 +20,13 @@ void		cmd_quit(int fd, t_channel *chan, fd_set *fd_write,
     msg = malloc(strlen(chan->nick[fd]) + 8 + strlen(reason));
   else
     msg = malloc(strlen(chan->nick[fd]) + 8);
-  if (msg == NULL)
-    exit(42);
   msg = strcpy(msg, chan->nick[fd]);
   msg = strcat(msg, " QUIT ");
-  close(fd);
-  chan->fd_type[fd] = FD_FREE;
   if (reason != NULL)
     msg = strcat(msg, reason);
   global_message(chan, msg);
+  close(fd);
+  chan->fd_type[fd] = FD_FREE;
 }
 
 void		join_remove_channel(t_channel *chan, char *channel, int fd)
