@@ -5,7 +5,7 @@
 ** Login   <malot_k@epitech.net>
 **
 ** Started on  Mon May 30 22:04:15 2016 Kevin Malot
-** Last update Thu Jun  2 17:29:38 2016 
+** Last update Fri Jun  3 00:03:26 2016 
 */
 
 #include "irc.h"
@@ -48,7 +48,8 @@ void		join_remove_channel(t_channel *chan, char *channel, int fd)
 	{
 	  valid = 1;
 	  if (tmp->fd_type[fd] == FD_FREE)
-	    dprintf(fd, ":irc.localhost 442 * channel :You're not on that channel !\r\n");
+	    dprintf(fd, ":irc.localhost 442 * channel "
+":You're not on that channel !\r\n");
 	  else
 	    {
 	      tmp->fd_type[fd] = FD_FREE;
@@ -82,6 +83,6 @@ void		cmd_part(int fd, t_channel *chan, fd_set *fd_write,
   else
     {
       join_remove_channel(chan, arg_one, fd);
-      join_set_channel(chan, "Accueil", fd);
+      join_set_channel(chan, "Accueil", fd, 0);
     }
 }

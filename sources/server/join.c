@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 30 18:14:50 2016
-** Last update Thu Jun  2 17:04:23 2016 
+** Last update Fri Jun  3 00:22:00 2016 
 */
 
 #include	"irc.h"
@@ -30,7 +30,37 @@ int		join_channel_exist(t_channel *chan, char *channel, int fd)
   return (i);
 }
 
-void		join_set_channel(t_channel *chan, char *channel, int fd)
+static void	join_c(int fd, t_channel *chan, char *chan_name, int c)
+{
+  if (chan->join[fd] == 0 && c != 0)
+    {
+      chan->join[fd] = 1;
+      dprintf(fd, ":%s!~%s@localhost JOIN :%s\r\n",
+	      chan->nick[fd] , chan->nick[fd], chan_name);
+      if (c == 1)
+	{
+	  dprintf(fd, ":irc.localhost MODE %s +nt\r\n"
+		  ":irc.localhost 353 %s = %s :@%s",
+		  chan_name, chan->nick[fd], chan_name, chan->nick[fd]);
+	}
+      else
+	{
+	  dprintf(fd, ":irc.localhost 353 %s = %s :%s",
+		  chan->nick[fd], chan_name, chan->nick[fd]);
+	  while (++c < MAX_FD)
+	    if (chan->fd_type[c] != FD_FREE && c != chan->creator
+		&& c != fd)
+	      dprintf(fd, " %s", chan->nick[c]);
+	  if (chan->fd_type[chan->creator] != FD_FREE)
+	    dprintf(fd, " @%s", chan->nick[chan->creator]);
+	}
+      dprintf(fd, "\r\n:irc.localhost 366 %s %s :End of /NAMES list.\r\n",
+	      chan->nick[fd], chan_name);
+    }
+}
+
+void		join_set_channel
+(t_channel *chan, char *channel, int fd, int c)
 {
   char		*msg;
   t_channel	*tmp;
@@ -46,16 +76,18 @@ void		join_set_channel(t_channel *chan, char *channel, int fd)
 	  tmp->nick[fd] = chan->nick[fd];
 	  tmp->fd_type[fd] = chan->fd_type[fd];
 	  tmp->fct_read[fd] = chan->fct_read[fd];
-	  /* chan->fd_type[fd] = FD_FREE; */
 	  msg = malloc((21 + (2*strlen(tmp->nick[fd]))
 			+ strlen(channel)) * sizeof(char));
 	  sprintf(msg, ":%s!~%s@localhost JOIN :%s",
 		  tmp->nick[fd], tmp->nick[fd], channel);
 	  chan_message(tmp, msg);
+	  join_c(fd, tmp, channel, c);
+	  return;
 	}
       tmp = tmp->next;
     }
 }
+
 
 void		cmd_join
 (int fd, t_channel *chan,
@@ -63,23 +95,17 @@ void		cmd_join
 {
   (void) fd_write;
   if (chan_name == NULL)
-    dprintf(fd, "461 * NICK :Not enough parameters\r\n");
+    dprintf(fd, ":irc.localhost 461 * NICK :Not enough parameters\r\n");
   else if (chan_name[0] != '#')
-    dprintf(fd, "433 * %s :Illegal channel name\r\n", chan_name);
+    dprintf(fd, ":irc.localhost 433 * %s :Illegal channel name\r\n", chan_name);
   else
     {
       if (join_channel_exist(chan, chan_name, fd) == 1)
-	join_set_channel(chan, chan_name, fd);
+	join_set_channel(chan, chan_name, fd, -1);
       else
 	{
 	  create_channel(chan, chan->port, chan_name, fd);
-	  join_set_channel(chan, chan_name, fd);
-	  dprintf(fd, ":%s!~%s@localhost JOIN :%s\r\n"
-		  ":irc.localhost MODE %s +nt\r\n"
-		  ":irc.localhost 353 %s = %s :@%s\r\n"
-		  ":irc.localhost 366 %s %s :End of /NAMES list.\r\n", chan->nick[fd]
-		  , chan->nick[fd], chan_name, chan_name, chan->nick[fd],
-		  chan_name, chan->nick[fd], chan->nick[fd], chan_name);
+	  join_set_channel(chan, chan_name, fd, 1);
 	}
     }
 }

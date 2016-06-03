@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 30 18:16:50 2016
-** Last update Thu Jun  2 17:05:37 2016 
+** Last update Fri Jun  3 00:07:02 2016 
 */
 
 #include	"irc.h"
@@ -17,10 +17,12 @@ void		cmd_nick
   char		*msg;
 
   (void) fd_write;
+  printf("FD = %d %p [%s]\n", fd, nick, nick);
   if (nick == NULL)
     dprintf(fd, ":irc.localhost 431 * NICK :No nickname given\r\n");
   else if (nick_exists(chan, nick))
-    dprintf(fd, ":irc.localhost 433 * %s :Nickname is already in use\r\n", nick);
+    dprintf(fd, ":irc.localhost 433 * %s "
+	    ":Nickname is already in use\r\n", nick);
   else
     {
       msg = malloc(7 + strlen(chan->nick[fd]) + strlen(nick));

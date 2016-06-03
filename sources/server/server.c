@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 16 10:41:14 2016 Julien Karst
-** Last update Thu Jun  2 17:25:45 2016 
+** Last update Fri Jun  3 00:38:02 2016 
 */
 
 #include "irc.h"
@@ -21,6 +21,7 @@ t_cmd                   cmds[] =
     {"SEND_FILE", &cmd_send},
     {"ACCEPT_FILE", &cmd_accept},
     {"QUIT", &cmd_quit},
+    {"NAMES", &cmd_names}
   };
 
 void	cmd_msg(int fd, t_channel *chan, fd_set *fd_write, char *arg_one)
