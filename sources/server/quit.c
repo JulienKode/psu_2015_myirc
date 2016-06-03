@@ -5,11 +5,7 @@
 ** Login   <malot_k@epitech.net>
 **
 ** Started on  Mon May 30 22:04:15 2016 Kevin Malot
-<<<<<<< HEAD
-** Last update Fri Jun  3 20:59:12 2016 
-=======
 ** Last update Fri Jun  3 10:27:09 2016
->>>>>>> remotes/origin/master
 */
 
 #include "irc.h"

@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 16 10:40:15 2016 Julien Karst
-** Last update Fri Jun  3 21:42:02 2016 
+** Last update Fri Jun  3 21:00:17 2016
 */
 
 #ifndef	IRC_H_
@@ -37,16 +37,14 @@ typedef struct		s_channel
   int			root;
   int			port;
   char			*name;
-  struct s_channel	*prev;
-  struct s_channel	*next;
-  fd_set		fd_read;
-  fd_set		fd_write;
+  int			circbuff_read[MAX_FD];
   t_circbuff		circbuff[MAX_FD];
   int			join[MAX_FD];
   char			fd_type[MAX_FD];
   fct			fct_read[MAX_FD];
-  fct			fct_write[MAX_FD];
   char			*nick[MAX_FD];
+  struct s_channel	*prev;
+  struct s_channel	*next;
 }			t_channel;
 
 typedef struct		s_cmd

@@ -24,6 +24,7 @@ t_cmd                   cmds[] =
     {"NAMES", &cmd_names}
   };
 
+
 void	cmd_msg(int fd, t_channel *chan, fd_set *fd_write, char *arg_one)
 {
   chan_message(chan, "Tu est sur le channel\r\n");
@@ -119,17 +120,18 @@ void			add_client(t_channel *chan, int s)
   cs = accept(s, (struct sockaddr *)&client_sin, &client_sin_len);
   chan->fd_type[cs] = FD_CLIENT;
   chan->fct_read[cs] = client_read;
-  chan->fct_write[cs] = NULL;
   chan->nick[cs] = strdup("Anonymous");
-  dprintf(cs, ":irc.localhost 001 Anonymous :Welcome to the Internet Relay"
-	  " Network Anonymous!~nobody@127.0.0.1\r\n"
-	  ":irc.localhost 002 Anonymous :Your host is irc.localhost, "
-	  "running version 1.0\r\n"
-	  ":irc.localhost 003 Anonymous :This server was created Sun May "
-	  "29 at 14:00:00\r\n"
-	  ":irc.localhost 004 Anonymous :irc.localhost 1.0 aoOirw "
-	  "abeiIklmnoOpqrsRstv\r\n");
-  global_message(chan, strdup(":An Anonymous USER joined the server !"));
+  circbuff_write(&(chan->circbuff[cs]), ":irc.localhost 001 Anonymous "
+		 ":Welcome to the Internet Relay"
+		 " Network Anonymous!~nobody@127.0.0.1\r\n"
+		 ":irc.localhost 002 Anonymous :Your host is irc.localhost, "
+		 "running version 1.0\r\n"
+		 ":irc.localhost 003 Anonymous :This server was created Sun "
+		 "May 29 at 14:00:00\r\n"
+		 ":irc.localhost 004 Anonymous :irc.localhost 1.0 aoOirw "
+		 "abeiIklmnoOpqrsRstv\r\n");
+  chan->circbuff_read[cs] = 1;
+  /* global_message(chan, strdup(":An Anonymous USER joined the server !")); */
 }
 
 void			server_read(t_channel *chan, int fd, fd_set *fd_read,
@@ -156,7 +158,7 @@ void			add_server(t_channel *chan)
   listen(s, 42);
   chan->next->fd_type[s] = FD_SERVER;
   chan->next->fct_read[s] = server_read;
-  chan->next->fct_write[s] = NULL;
+  chan->next->circbuff_read[s] = 0;
 }
 
 int			main(int ac, char **argv)
@@ -164,8 +166,9 @@ int			main(int ac, char **argv)
   t_channel		*chan;
   int			i;
   int			j;
-  fd_set fd_read;
-  fd_set fd_write;
+  fd_set		fd_read;
+  fd_set		fd_write;
+  int			ok;
 
   if (ac != 2)
     {
@@ -177,44 +180,45 @@ int			main(int ac, char **argv)
   add_server(chan);
   while (42)
     {
+      ok = 0;
       chan = chan->next;
       FD_ZERO(&fd_read);
       FD_ZERO(&fd_write);
       FD_SET(3, &fd_read);
       while (chan->root == 0)
 	{
-	  /* FD_ZERO(&(chan->fd_read)); */
 	  for (i = 0; i < MAX_FD; i++)
 	    if (chan->fd_type[i] == FD_CLIENT)
-	      /*     FD_SET(i, &(chan->fd_read)); */
-	      /* FD_ZERO(&(chan->fd_write)); */
-	      FD_SET(i, &fd_read);
+	      {
+		FD_SET(i, &fd_read);
+		if (chan->circbuff_read[i])
+		  FD_SET(i, &fd_write);
+	      }
 	  chan = chan->next;
 	}
-      //for (i = 0; i < MAX_FD; i++)
-      //if (chan->fd_type[i] != FD_FREE) et quelque chose dans le buffer circulaire
-      //FD_SET(i, &(chan->fd_write));
-      if (select(MAX_FD + 1, &fd_read, NULL, NULL, NULL) == -1)
-	return (0);
       chan = chan->next;
-      int ok = 0;
+      if (select(MAX_FD + 1, &fd_read, &fd_write, NULL, NULL) == -1)
+	return (0);
       while (chan->root == 0 && ok == 0)
 	{
 	  for (j = 0; j < MAX_FD; j++)
-	    if (FD_ISSET(j, &fd_read) && chan->fd_type[j] != FD_FREE)
-	      {
-		chan->fct_read[j](chan, j, fd_read, fd_write);
-		ok = 1;
-	      }
+	    {
+	      if (FD_ISSET(j, &fd_read) && chan->fd_type[j] != FD_FREE)
+		{
+		  chan->fct_read[j](chan, j, fd_read, fd_write);
+		  ok = 1;
+		}
+	      else if (FD_ISSET(j, &fd_write) && chan->fd_type[j] != FD_FREE)
+		{
+		  client_write(chan, j);
+		  ok = 1;
+		}
+	    }
 	  chan = chan->next;
 	}
       while (chan->root == 0)
 	chan = chan->next;
-      /* for (j = 0; j < MAX_FD; j++) */
-      /*   if (FD_ISSET(j, &(chan->fd_write))) */
-      /*     dprintf(j, "%s", chan->circbuff[j]); */
-      /* chan = chan->next; */
-      /* } */
+      chan = chan->next;
     }
   return (0);
 }
