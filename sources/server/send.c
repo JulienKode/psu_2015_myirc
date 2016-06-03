@@ -41,7 +41,7 @@ void		chan_message(t_channel *chan, char *msg)
   printf("Debug : chan %s\n", chan->name);
   while (i < MAX_FD)
     {
-      if (chan->fd_type[i] == FD_CLIENT && FD_ISSET(i, &(chan->fd_write)))
+      if (chan->fd_type[i] == FD_CLIENT /* && FD_ISSET(i, &(chan->fd_write)) */)
 	dprintf(i, "%s\r\n", msg);
       i++;
     }

@@ -27,7 +27,16 @@ void		cmd_quit(int fd, t_channel *chan, fd_set *fd_write,
   if (reason != NULL)
     msg = strcat(msg, reason);
   global_message(chan, msg);
-  chan->fd_type[fd] = FD_FREE;
+
+  t_channel *tmp = chan;
+  while (tmp->root == 0)
+    tmp = tmp->next;
+  tmp = tmp->next;
+  while (tmp->root == 0)
+    {
+      chan->fd_type[fd] = FD_FREE;
+      tmp = tmp->next;
+    }
   close(fd);
 }
 
@@ -55,10 +64,7 @@ void		join_remove_channel(t_channel *chan, char *channel, int fd)
 	      tmp->fd_type[fd] = FD_FREE;
 	      msg = malloc(7 + strlen(chan->nick[fd]) + strlen(channel));
 	      if (msg == NULL)
-		{
-		  close(fd);
-		  chan->fd_type[fd] = FD_FREE;
-		}
+		return;
 	      msg = strcpy(msg, chan->nick[fd]);
 	      msg = strcat(msg, " PART ");
 	      msg = strcat(msg, channel);
