@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 30 21:07:04 2016
-** Last update Mon May 30 21:26:44 2016 
+** Last update Mon May 30 21:26:44 2016
 */
 
 #include	"irc.h"
@@ -24,7 +24,7 @@ void		global_message(t_channel *chan, char *msg)
       i = 0;
       while (i < MAX_FD)
 	{
-	  if (tmp->fd_type[i] == FD_CLIENT && FD_ISSET(i, &(tmp->fd_write)))
+	  if (tmp->fd_type[i] == FD_CLIENT)
 	    dprintf(i, ":%s\r\n", msg);
 	  i++;
 	}
