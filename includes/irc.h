@@ -70,6 +70,7 @@ void			cmd_send(int, t_channel *, fd_set *, char *);
 void			cmd_accept(int, t_channel *, fd_set *, char *);
 void			cmd_names(int, t_channel *, fd_set *, char *);
 void			create_channel(t_channel *, int, char *, int);
+void			client_exit(t_channel *, int);
 t_channel		*found_channel_by_name(t_channel *, char *);
 t_channel		*init_list();
 

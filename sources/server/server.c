@@ -104,9 +104,8 @@ void			client_read(t_channel *chan, int fd, fd_set *fd_read,
 	  msg = strcat(msg, " QUIT :Disconnected by User");
 	  global_message(chan, msg);
 	}
-      chan->fd_type[fd] = FD_FREE; // Ici il faudrait free dans tous les channels comme quit.c
+      client_exit(chan, fd);
       fclose(fp);
-      close(fd);
     }
 }
 

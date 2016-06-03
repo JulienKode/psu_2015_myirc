@@ -10,14 +10,30 @@
 
 #include "irc.h"
 
+void		client_exit(t_channel *chan, int fd)
+{
+  t_channel	*tmp;
+
+  tmp = chan;
+  while (tmp->root == 0)
+    tmp = tmp->next;
+  tmp = tmp->next;
+  while (tmp->root == 0)
+    {
+      tmp->fd_type[fd] = FD_FREE;
+      memset(tmp->circbuff[fd].buffer, 0, 1024);
+      tmp->circbuff_read[fd] = 0;
+      tmp = tmp->next;
+    }
+  close(fd);
+}
+
 void		cmd_quit(int fd, t_channel *chan, fd_set *fd_write,
 			 char *reason)
 {
-  t_channel	*tmp;
   char		*msg;
 
   (void) fd_write;
-  tmp = chan;
   if (reason != NULL)
     msg = malloc(strlen(chan->nick[fd]) + 8 + strlen(reason));
   else
@@ -29,15 +45,7 @@ void		cmd_quit(int fd, t_channel *chan, fd_set *fd_write,
   if (reason != NULL)
     msg = strcat(msg, reason);
   global_message(chan, msg);
-  while (tmp->root == 0)
-    tmp = tmp->next;
-  tmp = tmp->next;
-  while (tmp->root == 0)
-    {
-      tmp->fd_type[fd] = FD_FREE;
-      tmp = tmp->next;
-    }
-  close(fd);
+  client_exit(chan, fd);
 }
 
 void		join_remove_channel(t_channel *chan, char *channel, int fd)
