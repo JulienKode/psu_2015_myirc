@@ -5,7 +5,11 @@
 ** Login   <malot_k@epitech.net>
 **
 ** Started on  Mon May 30 22:04:15 2016 Kevin Malot
-** Last update Fri Jun  3 19:25:49 2016
+<<<<<<< HEAD
+** Last update Fri Jun  3 20:59:12 2016 
+=======
+** Last update Fri Jun  3 10:27:09 2016
+>>>>>>> remotes/origin/master
 */
 
 #include "irc.h"
@@ -13,9 +17,11 @@
 void		cmd_quit(int fd, t_channel *chan, fd_set *fd_write,
 			 char *reason)
 {
+  t_channel	*tmp;
   char		*msg;
 
   (void) fd_write;
+  tmp = chan;
   if (reason != NULL)
     msg = malloc(strlen(chan->nick[fd]) + 8 + strlen(reason));
   else
@@ -27,8 +33,6 @@ void		cmd_quit(int fd, t_channel *chan, fd_set *fd_write,
   if (reason != NULL)
     msg = strcat(msg, reason);
   global_message(chan, msg);
-
-  t_channel *tmp = chan;
   while (tmp->root == 0)
     tmp = tmp->next;
   tmp = tmp->next;
