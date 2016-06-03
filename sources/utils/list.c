@@ -41,11 +41,7 @@ void		create_channel(t_channel *root, int port, char *name, int fd)
     elem->circbuff[i] = circbuff_create(1024);
   memset(elem->fd_type, FD_FREE, MAX_FD);
   memset(elem->join, 0, MAX_FD);
-  while (++i < MAX_FD)
-    elem->circbuff[i] = circbuff_create(1024);
-  i = 0;
-  while (++i < MAX_FD)
-    elem->circbuff_read[i] = 0;
+  memset(elem->circbuff_read, 0, MAX_FD);
   elem->name = strdup(name);
   elem->prev = root->prev;
   elem->next = root;

@@ -13,7 +13,6 @@
 void		global_message(t_channel *chan, char *msg)
 {
   t_channel	*tmp;
-  int		i;
 
   tmp = chan;
   while (tmp->root == 0)
@@ -21,28 +20,28 @@ void		global_message(t_channel *chan, char *msg)
   tmp = tmp->next;
   while (tmp->root == 0)
     {
-      i = 0;
-      while (i < MAX_FD)
-	{
-	  if (tmp->fd_type[i] == FD_CLIENT)
-	    dprintf(i, ":%s\r\n", msg);
-	  i++;
-	}
+      chan_message(tmp, msg);
       tmp = tmp->next;
     }
-  free(msg);
 }
 
 void		chan_message(t_channel *chan, char *msg)
 {
   int		i;
+  char		*buf;
 
   i = 0;
-  printf("Debug : chan %s\n", chan->name);
   while (i < MAX_FD)
     {
-      if (chan->fd_type[i] == FD_CLIENT /* && FD_ISSET(i, &(chan->fd_write)) */)
-	dprintf(i, "%s\r\n", msg);
+      if (chan->fd_type[i] == FD_CLIENT)
+	{
+	  buf = malloc(strlen(msg) + 6);
+	  if (buf == NULL)
+	    return;
+	  sprintf(buf, ":%s\r\n", msg);
+	  circbuff_write(&(chan->circbuff[i]), buf);
+	  chan->circbuff_read[i] = 1;
+	}
       i++;
     }
 }

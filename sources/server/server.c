@@ -72,7 +72,7 @@ void			parse_cmd(char *buf, t_channel *chan, int fd, fd_set *fd_write)
 	}
       i++;
     }
-  if (valid == 0)
+  if (valid == 0 && strlen(buf) > 0)
     dprintf(fd, ":irc.localhost %s %s :Unknown command\r\n", chan->nick[fd], cmd);
 }
 
@@ -104,7 +104,7 @@ void			client_read(t_channel *chan, int fd, fd_set *fd_read,
 	  msg = strcat(msg, " QUIT :Disconnected by User");
 	  global_message(chan, msg);
 	}
-      chan->fd_type[fd] = FD_FREE;
+      chan->fd_type[fd] = FD_FREE; // Ici il faudrait free dans tous les channels comme quit.c
       fclose(fp);
       close(fd);
     }
@@ -131,7 +131,7 @@ void			add_client(t_channel *chan, int s)
 		 ":irc.localhost 004 Anonymous :irc.localhost 1.0 aoOirw "
 		 "abeiIklmnoOpqrsRstv\r\n");
   chan->circbuff_read[cs] = 1;
-  /* global_message(chan, strdup(":An Anonymous USER joined the server !")); */
+  global_message(chan, "An Anonymous USER joined the server !");
 }
 
 void			server_read(t_channel *chan, int fd, fd_set *fd_read,
@@ -168,7 +168,7 @@ int			main(int ac, char **argv)
   int			j;
   fd_set		fd_read;
   fd_set		fd_write;
-  int			ok;
+  int			fd_ok[MAX_FD];
 
   if (ac != 2)
     {
@@ -180,7 +180,6 @@ int			main(int ac, char **argv)
   add_server(chan);
   while (42)
     {
-      ok = 0;
       chan = chan->next;
       FD_ZERO(&fd_read);
       FD_ZERO(&fd_write);
@@ -199,26 +198,29 @@ int			main(int ac, char **argv)
       chan = chan->next;
       if (select(MAX_FD + 1, &fd_read, &fd_write, NULL, NULL) == -1)
 	return (0);
-      while (chan->root == 0 && ok == 0)
+      memset(fd_ok, 0, MAX_FD);
+      while (chan->root == 0)
 	{
 	  for (j = 0; j < MAX_FD; j++)
 	    {
-	      if (FD_ISSET(j, &fd_read) && chan->fd_type[j] != FD_FREE)
+	      if (fd_ok[j] == 0 && chan->fd_type[j] != FD_FREE)
 		{
-		  chan->fct_read[j](chan, j, fd_read, fd_write);
-		  ok = 1;
-		}
-	      else if (FD_ISSET(j, &fd_write) && chan->fd_type[j] != FD_FREE)
-		{
-		  client_write(chan, j);
-		  ok = 1;
+		  if (FD_ISSET(j, &fd_read))
+		    {
+		      chan->fct_read[j](chan, j, fd_read, fd_write);
+		      fd_ok[j] = 1;
+		    }
+		  else if (FD_ISSET(j, &fd_write))
+		    {
+		      client_write(chan, j);
+		      fd_ok[j] = 1;
+		    }
 		}
 	    }
 	  chan = chan->next;
 	}
       while (chan->root == 0)
 	chan = chan->next;
-      chan = chan->next;
     }
   return (0);
 }
