@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 30 21:07:04 2016
-** Last update Sat Jun  4 15:00:06 2016 
+** Last update Sat Jun  4 15:00:06 2016
 */
 
 #include	"irc.h"
@@ -39,7 +39,6 @@ int		send_user(t_channel *chan, char *user, char *msg)
   int		i;
   t_channel	*tmp;
   char		*buf;
-
 
   asprintf(&buf, ":%s\r\n", msg);
   tmp = found_channel_by_name(chan, "Accueil");

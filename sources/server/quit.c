@@ -40,6 +40,30 @@ void		cmd_quit(int fd, t_channel *chan, char *reason)
   client_exit(chan, fd);
 }
 
+int		join_remove_check(t_channel *tmp, char *channel, int fd, int valid)
+{
+  char		*msg;
+
+  if (strcmp("*", channel) == 0 || strcmp(tmp->name, channel) == 0)
+    {
+      valid = 1;
+      if (tmp->fd_type[fd] == FD_FREE)
+	{
+	  asprintf(&msg, ":irc.localhost 442 * channel "
+		   ":You're not on that channel !\r\n");
+	  circbuff_write(&(data->circbuff[fd]), msg);
+	  data->circbuff_read[fd] = 1;
+	}
+      else
+	{
+	  asprintf(&msg, "%s PART %s", tmp->nick[fd], channel);
+	  chan_message(tmp, msg);
+	  tmp->fd_type[fd] = FD_FREE;
+	}
+    }
+  return (valid);
+}
+
 void		join_remove_channel(t_channel *chan, char *channel, int fd)
 {
   t_channel	*tmp;
@@ -53,23 +77,7 @@ void		join_remove_channel(t_channel *chan, char *channel, int fd)
   tmp = tmp->next;
   while (tmp->root == 0)
     {
-      if (strcmp("*", channel) == 0 || strcmp(tmp->name, channel) == 0)
-	{
-	  valid = 1;
-	  if (tmp->fd_type[fd] == FD_FREE)
-	    {
-	      asprintf(&msg, ":irc.localhost 442 * channel "
-		       ":You're not on that channel !\r\n");
-	      circbuff_write(&(data->circbuff[fd]), msg);
-	      data->circbuff_read[fd] = 1;
-	    }
-	  else
-	    {
-	      asprintf(&msg, "%s PART %s", chan->nick[fd], channel);
-	      chan_message(chan, msg);
-	      tmp->fd_type[fd] = FD_FREE;
-	    }
-	}
+      valid = join_remove_check(tmp, channel, fd, valid);
       tmp = tmp->next;
     }
   if (valid == 0)
