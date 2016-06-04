@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 30 22:48:45 2016
-** Last update Sat Jun  4 14:26:12 2016
+** Last update Sat Jun  4 14:58:24 2016 
 */
 
 #include	"irc.h"
@@ -59,7 +59,7 @@ void		cmd_msg
   datas = strtok(NULL, " \t");
   if (msg_gere_error(chan, arg_one, datas, fd) == 0)
     return;
-  asprintf(&msg, ":%s!~%s@localhost PRIVMSG %s :%s\r\n",
+  asprintf(&msg, "%s!~%s@localhost PRIVMSG %s :%s",
 	   chan->nick[fd], chan->nick[fd], arg_one, datas);
   if (arg_one && arg_one[0] == '#')
     {

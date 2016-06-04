@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 30 18:14:50 2016
-** Last update Fri Jun  3 00:22:00 2016
+** Last update Sat Jun  4 14:55:41 2016 
 */
 
 #include	"irc.h"
@@ -37,10 +37,6 @@ static void	join_c(int fd, t_channel *chan, char *chan_name, int c)
   if (chan->join[fd] == 0 && c != 0)
     {
       chan->join[fd] = 1;
-      asprintf(&buf, ":%s!~%s@localhost JOIN :%s\r\n",
-	       chan->nick[fd] , chan->nick[fd], chan_name);
-      circbuff_write(&(data->circbuff[fd]), buf);
-      data->circbuff_read[fd] = 1;
       if (c == 1)
 	{
 	  asprintf(&buf, ":irc.localhost MODE %s +nt\r\n"
@@ -95,7 +91,7 @@ void		join_set_channel
 	  tmp->fd_type[fd] = chan->fd_type[fd];
 	  tmp->fct_read[fd] = chan->fct_read[fd];
 	  asprintf(&msg, "%s!~%s@localhost JOIN :%s",
-		  tmp->nick[fd], tmp->nick[fd], channel);
+		   tmp->nick[fd], tmp->nick[fd], channel);
 	  chan_message(tmp, msg);
 	  join_c(fd, tmp, channel, c);
 	  return;
@@ -120,7 +116,8 @@ void		cmd_join
     }
   else if (chan_name[0] != '#')
     {
-      asprintf(&buf, ":irc.localhost 433 * %s :Illegal channel name\r\n", chan_name);
+      asprintf(&buf, ":irc.localhost 433 * %s"
+	       " :Illegal channel name\r\n", chan_name);
       circbuff_write(&(data->circbuff[fd]), buf);
       data->circbuff_read[fd] = 1;
     }
