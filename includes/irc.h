@@ -5,13 +5,12 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 16 10:40:15 2016 Julien Karst
-** Last update Sat Jun  4 17:52:33 2016 
+** Last update Sat Jun  4 17:30:02 2016
 */
 
 #ifndef			IRC_H_
 #define			IRC_H_
 
-#define			_GNU_SOURCE
 #define			FD_FREE		0
 #define			FD_CLIENT	1
 #define			FD_SERVER	2

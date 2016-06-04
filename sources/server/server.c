@@ -109,13 +109,19 @@ void			add_server(t_channel *chan)
   int			val;
 
   val = 1;
-  s = socket(PF_INET, SOCK_STREAM, 0);
+  if ((s = socket(PF_INET, SOCK_STREAM, 0)) == -1)
+    exit(42);
   setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(int));
   sin.sin_family = AF_INET;
   sin.sin_port = htons(chan->next->port);
   sin.sin_addr.s_addr = INADDR_ANY;
-  bind(s, (struct sockaddr*)&sin, sizeof(sin));
-  listen(s, 42);
+  if (bind(s, (struct sockaddr*)&sin, sizeof(sin)) == -1)
+    {
+      close(s);
+      exit(42);
+    }
+  if (listen(s, 42) == -1)
+    exit(42);
   chan->next->fd_type[s] = FD_SERVER;
   chan->next->fct_read[s] = add_client;
   data->circbuff_read[s] = 0;
