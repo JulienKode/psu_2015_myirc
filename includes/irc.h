@@ -5,12 +5,13 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 16 10:40:15 2016 Julien Karst
-** Last update Fri Jun  3 21:00:17 2016
+** Last update Sat Jun  4 14:24:17 2016 
 */
 
 #ifndef	IRC_H_
 #define	IRC_H_
 
+#define _GNU_SOURCE
 #define	FD_FREE 0
 #define	FD_CLIENT 1
 #define FD_SERVER 2
@@ -53,6 +54,7 @@ typedef struct		s_cmd
   void			(*p)(int, t_channel *, fd_set *, char *);
 }			t_cmd;
 
+int			send_user(t_channel*, char*, char*);
 void			client_write(t_channel*, int);
 int			nick_exists(t_channel *, char *);
 void			join_set_channel(t_channel *, char *, int, int);
