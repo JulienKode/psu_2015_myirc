@@ -58,6 +58,8 @@ static void	print_channel(t_channel *chan, int fd, char *str)
 
   c = -1;
   tmp = found_channel_by_name(chan, str);
+  if (tmp == NULL)
+    return;
   asprintf(&buf, ":irc.localhost 353 %s = %s :%s",
 	  tmp->nick[fd], tmp->name, tmp->nick[fd]);
   circbuff_write(&(data->circbuff[fd]), buf);

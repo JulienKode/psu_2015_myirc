@@ -18,15 +18,9 @@ int		nb_of_users(t_channel *chan)
 
   i = -1;
   j = 0;
-  tmp = chan;
-  while (tmp->root == 0)
-    tmp = tmp->next;
-  tmp = tmp->next->next;
-  /* while (tmp->root == 0) */
-  /*   { */
-  printf("Nom chanel : %s\n", tmp->name);
+  tmp = found_channel_by_name(chan, "Accueil");
   while (++i < MAX_FD)
-    if (tmp && tmp->fd_type[i] != FD_FREE)
+    if (tmp && tmp->fd_type[i] == FD_CLIENT)
       j++;
   return (j);
 }
