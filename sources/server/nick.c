@@ -14,20 +14,22 @@ void		cmd_nick(int fd, t_channel *chan, char *nick)
 {
   char		*msg;
 
-  printf("FD = %d %p [%s]\n", fd, nick, nick);
   if (nick == NULL)
-    dprintf(fd, ":irc.localhost 431 * NICK :No nickname given\r\n");
+    {
+      asprintf(&msg, ":irc.localhost 431 * NICK :No nickname given\r\n");
+      circbuff_write(&(data->circbuff[fd]), msg);
+      data->circbuff_read[fd] = 1;
+    }
   else if (nick_exists(chan, nick))
-    dprintf(fd, ":irc.localhost 433 * %s "
-	    ":Nickname is already in use\r\n", nick);
+    {
+      asprintf(&msg, ":irc.localhost 433 * %s "
+	       ":Nickname is already in use\r\n", nick);
+      circbuff_write(&(data->circbuff[fd]), msg);
+      data->circbuff_read[fd] = 1;
+    }
   else
     {
-      msg = malloc(7 + strlen(chan->nick[fd]) + strlen(nick));
-      if (msg == NULL)
-	return;
-      msg = strcpy(msg, chan->nick[fd]);
-      msg = strcat(msg, " NICK ");
-      msg = strcat(msg, nick);
+      asprintf(&msg, "%s NICK %s", chan->nick[fd], nick);
       global_message(chan, msg);
       chan->nick[fd] = strdup(nick);
     }
