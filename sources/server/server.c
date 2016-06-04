@@ -27,7 +27,6 @@ t_cmd                   cmds[] =
   };
 
 void			parse_cmd(char *buf, t_channel *chan, int fd)
-
 {
   char			*cmd;
   char			*arg_one;

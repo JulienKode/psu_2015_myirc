@@ -1,5 +1,5 @@
 /*
-1;2802;0c** list.c for  in /home/karst_j/PSU_2015_myirc/sources/server
+** list.c for  in /home/karst_j/PSU_2015_myirc/sources/server
 **
 ** Made by
 ** Login   <karst_j@epitech.net>
