@@ -5,30 +5,50 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 30 22:35:33 2016
-** Last update Mon May 30 22:37:27 2016 
+** Last update Sat Jun  4 15:56:16 2016
 */
 
 #include	"irc.h"
 
-void		cmd_list
-(int fd, t_channel *chan,
- fd_set *fd_write, char *arg_one)
+void		cmd_list_loop(t_channel *chan, t_channel *tmp, int fd, char *a)
+{
+  char		*buf;
+
+  if (a && tmp->name && tmp->name[0] == '#' && strstr(tmp->name, a))
+    {
+      asprintf(&buf, ":irc.localhost 322 %s %s %d :\r\n",
+	       chan->nick[fd], tmp->name, nb_of_users(tmp));
+      circbuff_write(&(data->circbuff[fd]), buf);
+      data->circbuff_read[fd] = 1;
+    }
+  else if (tmp->name && tmp->name[0] == '#' && a == NULL)
+    {
+      asprintf(&buf, ":irc.localhost 322 %s %s %d :\r\n", chan->nick[fd],
+	       tmp->name, nb_of_users(tmp));
+      circbuff_write(&(data->circbuff[fd]), buf);
+      data->circbuff_read[fd] = 1;
+    }
+}
+
+void		cmd_list(int fd, t_channel *chan, char *arg_one)
 {
   t_channel	*tmp;
+  char		*buf;
 
   tmp = chan;
-  (void) fd_write;
   while (tmp->root == 0)
     tmp = tmp->next;
   tmp = tmp->next;
-  dprintf(fd, "321 %s Channel :Users  Name\r\n", chan->nick[fd]);
+  asprintf(&buf, ":irc.localhost 321 %s Channel :Users  Name\r\n",
+	   chan->nick[fd]);
+  circbuff_write(&(data->circbuff[fd]), buf);
+  data->circbuff_read[fd] = 1;
   while (tmp->root == 0)
     {
-      if (arg_one && tmp->name && strstr(tmp->name, arg_one) != NULL)
-	dprintf(fd, "322 %s %s 1 :\r\n", chan->nick[fd], tmp->name);
-      else if (tmp->name && arg_one == NULL)
-	dprintf(fd, "322 %s %s 1 :\r\n", chan->nick[fd], tmp->name);
+      cmd_list_loop(chan, tmp, fd, arg_one);
       tmp = tmp->next;
     }
-  dprintf(fd, "323 %s :End of /LIST\r\n", chan->nick[fd]);
+  asprintf(&buf, ":irc.localhost 323 %s :End of /LIST\r\n", chan->nick[fd]);
+  circbuff_write(&(data->circbuff[fd]), buf);
+  data->circbuff_read[fd] = 1;
 }
