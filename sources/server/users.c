@@ -1,5 +1,5 @@
 /*
-** users.c for  in /home/karst_j/PSU_2015_myirc/sources/server
+1;2802;0c** users.c for  in /home/karst_j/PSU_2015_myirc/sources/server
 **
 ** Made by
 ** Login   <karst_j@epitech.net>
@@ -12,33 +12,42 @@
 
 int		nb_of_users(t_channel *chan)
 {
-  t_channel	*tmp;
   int		i;
   int		j;
 
   i = -1;
   j = 0;
-  tmp = found_channel_by_name(chan, "Accueil");
   while (++i < MAX_FD)
-    if (tmp && tmp->fd_type[i] == FD_CLIENT)
+    if (chan && chan->fd_type[i] == FD_CLIENT)
       j++;
   return (j);
 }
 
-void		cmd_users
-(int fd, t_channel *chan,
- fd_set *fd_write, char *arg_one)
+void		cmd_users(int fd, t_channel *chan, char *arg_one)
 {
-  int		res;
   char		*buf;
+  t_channel	*tmp;
+  int		i;
 
-  (void) fd_write;
+  tmp = chan;
   (void) arg_one;
-  res = nb_of_users(chan);
-  asprintf(&buf,
-	  ":irc.localhost 265 to :Current local users: %d  Max: %d\r\n"
-	  ":irc.localhost 266 to :Current global users: %d  Max: %d\r\n",
-	  res, res, res, res);
+  asprintf(&buf, ":irc.localhost 392 :UserID   Terminal  Host\r\n");
+  circbuff_write(&(data->circbuff[fd]), buf);
+  data->circbuff_read[fd] = 1;
+
+  tmp = found_channel_by_name(chan, "Accueil");
+  i = 0;
+  while (i < MAX_FD)
+    {
+      if (tmp->fd_type[i] == FD_CLIENT)
+	{
+	  asprintf(&buf, ":irc.localhost 393 :%s\r\n", tmp->nick[i]);
+	  circbuff_write(&(data->circbuff[fd]), buf);
+	  data->circbuff_read[fd] = 1;
+	}
+      i++;
+    }
+  asprintf(&buf, ":irc.localhost 394 :End of users\r\n");
   circbuff_write(&(data->circbuff[fd]), buf);
   data->circbuff_read[fd] = 1;
 }

@@ -5,12 +5,12 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 16 10:41:14 2016 Julien Karst
-** Last update Sat Jun  4 13:09:01 2016 
+** Last update Sat Jun  4 13:09:01 2016
 */
 
 #include "irc.h"
 
-t_data *data = NULL;
+t_data			*data = NULL;
 
 t_cmd                   cmds[] =
   {
@@ -26,24 +26,22 @@ t_cmd                   cmds[] =
     {"NAMES", &cmd_names}
   };
 
-void	cmd_send(int fd, t_channel *chan, fd_set *fd_write, char *arg_one)
+void	cmd_send(int fd, t_channel *chan, char *arg_one)
 {
   (void) fd;
   (void) chan;
-  (void) fd_write;
   (void) arg_one;
 }
 
-void	cmd_accept(int fd, t_channel *chan, fd_set *fd_write, char *arg_one)
+void	cmd_accept(int fd, t_channel *chan, char *arg_one)
 {
   (void) fd;
   (void) chan;
-  (void) fd_write;
   (void) arg_one;
 }
 
-void			parse_cmd(char *buf, t_channel *chan, int fd,
-				  fd_set *fd_write)
+void			parse_cmd(char *buf, t_channel *chan, int fd)
+
 {
   char			*cmd;
   char			*arg_one;
@@ -60,7 +58,7 @@ void			parse_cmd(char *buf, t_channel *chan, int fd,
     {
       if (cmd && strcmp(cmds[i].name, cmd) == 0)
 	{
-	  cmds[i].p(fd, chan, fd_write, arg_one);
+	  cmds[i].p(fd, chan, arg_one);
 	  valid = 1;
 	}
       i++;
@@ -74,8 +72,7 @@ void			parse_cmd(char *buf, t_channel *chan, int fd,
     }
 }
 
-void			client_read(t_channel *chan, int fd, fd_set *fd_read,
-				    fd_set *fd_write)
+void			client_read(t_channel *chan, int fd)
 {
   char			*buf;
   int			size;
@@ -86,11 +83,10 @@ void			client_read(t_channel *chan, int fd, fd_set *fd_read,
   n = 4096;
   fp = fdopen(fd, "r");
   buf = NULL;
-  (void) fd_read;
   if ((size = getline(&buf, &n, fp)) > 1)
     {
       buf[size - 1] = 0;
-      parse_cmd(buf, chan, fd, fd_write);
+      parse_cmd(buf, chan, fd);
     }
   else
     {
@@ -125,14 +121,6 @@ void			add_client(t_channel *chan, int s)
   global_message(chan, "An Anonymous USER joined the server !");
 }
 
-void			server_read(t_channel *chan, int fd, fd_set *fd_read,
-				    fd_set *fd_write)
-{
-  (void) fd_read;
-  (void) fd_write;
-  add_client(chan, fd);
-}
-
 void			add_server(t_channel *chan)
 {
   int			s;
@@ -148,7 +136,7 @@ void			add_server(t_channel *chan)
   bind(s, (struct sockaddr*)&sin, sizeof(sin));
   listen(s, 42);
   chan->next->fd_type[s] = FD_SERVER;
-  chan->next->fct_read[s] = server_read;
+  chan->next->fct_read[s] = add_client;
   data->circbuff_read[s] = 0;
 }
 
@@ -204,7 +192,7 @@ int			main(int ac, char **argv)
 		{
 		  if (FD_ISSET(j, &fd_read))
 		    {
-		      chan->fct_read[j](chan, j, fd_read, fd_write);
+		      chan->fct_read[j](chan, j);
 		      fd_ok[j] = 1;
 		    }
 		  else if (FD_ISSET(j, &fd_write))
