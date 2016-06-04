@@ -32,7 +32,7 @@ void		cmd_quit(int fd, t_channel *chan, char *reason)
 {
   char		*msg;
 
-  if (reason != NULL)
+  if (reason == NULL)
     asprintf(&msg, "%s QUIT", chan->nick[fd]);
   else
     asprintf(&msg, "%s QUIT :%s", chan->nick[fd], reason);

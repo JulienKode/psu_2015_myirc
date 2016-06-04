@@ -30,6 +30,32 @@ int		join_channel_exist(t_channel *chan, char *channel, int fd)
   return (i);
 }
 
+static void	join_c_old(t_channel *chan, int fd, char *chan_name)
+{
+  char		*buf;
+  int		c;
+
+  c = -1;
+  asprintf(&buf, ":irc.localhost 353 %s = %s :%s",
+	   chan->nick[fd], chan_name, chan->nick[fd]);
+  circbuff_write(&(data->circbuff[fd]), buf);
+  data->circbuff_read[fd] = 1;
+  while (++c < MAX_FD)
+    if (chan->fd_type[c] != FD_FREE && c != chan->creator
+	&& c != fd)
+      {
+	asprintf(&buf, " %s", chan->nick[c]);
+	circbuff_write(&(data->circbuff[fd]), buf);
+	data->circbuff_read[fd] = 1;
+      }
+  if (chan->fd_type[chan->creator] != FD_FREE)
+    {
+      asprintf(&buf, " @%s", chan->nick[chan->creator]);
+      circbuff_write(&(data->circbuff[fd]), buf);
+      data->circbuff_read[fd] = 1;
+    }
+}
+
 static void	join_c(int fd, t_channel *chan, char *chan_name, int c)
 {
   char		*buf;
@@ -46,26 +72,7 @@ static void	join_c(int fd, t_channel *chan, char *chan_name, int c)
 	  data->circbuff_read[fd] = 1;
 	}
       else
-	{
-	  asprintf(&buf, ":irc.localhost 353 %s = %s :%s",
-		  chan->nick[fd], chan_name, chan->nick[fd]);
-	  circbuff_write(&(data->circbuff[fd]), buf);
-	  data->circbuff_read[fd] = 1;
-	  while (++c < MAX_FD)
-	    if (chan->fd_type[c] != FD_FREE && c != chan->creator
-		&& c != fd)
-	      {
-		asprintf(&buf, " %s", chan->nick[c]);
-		circbuff_write(&(data->circbuff[fd]), buf);
-		data->circbuff_read[fd] = 1;
-	      }
-	  if (chan->fd_type[chan->creator] != FD_FREE)
-	    {
-	      asprintf(&buf, " @%s", chan->nick[chan->creator]);
-	      circbuff_write(&(data->circbuff[fd]), buf);
-	      data->circbuff_read[fd] = 1;
-	    }
-	}
+	join_c_old(chan, fd, chan_name);
       asprintf(&buf, "\r\n:irc.localhost 366 %s %s :End of /NAMES list.\r\n",
 	      chan->nick[fd], chan_name);
       circbuff_write(&(data->circbuff[fd]), buf);
@@ -98,7 +105,6 @@ void		join_set_channel(t_channel *chan, char *channel, int fd, int c)
       tmp = tmp->next;
     }
 }
-
 
 void		cmd_join(int fd, t_channel *chan, char *chan_name)
 {
