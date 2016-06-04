@@ -5,30 +5,31 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 30 18:16:50 2016
-** Last update Mon May 30 18:17:55 2016
+** Last update Fri Jun  3 00:07:02 2016
 */
 
 #include	"irc.h"
 
-void		cmd_nick
-(int fd, t_channel *chan,
- fd_set *fd_write, char *nick)
+void		cmd_nick(int fd, t_channel *chan, char *nick)
 {
   char		*msg;
 
-  (void) fd_write;
   if (nick == NULL)
-    dprintf(fd, "431 * NICK :No nickname given\r\n");
+    {
+      asprintf(&msg, ":irc.localhost 431 * NICK :No nickname given\r\n");
+      circbuff_write(&(data->circbuff[fd]), msg);
+      data->circbuff_read[fd] = 1;
+    }
   else if (nick_exists(chan, nick))
-    dprintf(fd, "433 * %s :Nickname is already in use\r\n", nick);
+    {
+      asprintf(&msg, ":irc.localhost 433 * %s "
+	       ":Nickname is already in use\r\n", nick);
+      circbuff_write(&(data->circbuff[fd]), msg);
+      data->circbuff_read[fd] = 1;
+    }
   else
     {
-      msg = malloc(7 + strlen(chan->nick[fd]) + strlen(nick));
-      if (msg == NULL)
-	exit(42);
-      msg = strcpy(msg, chan->nick[fd]);
-      msg = strcat(msg, " NICK ");
-      msg = strcat(msg, nick);
+      asprintf(&msg, "%s NICK %s", chan->nick[fd], nick);
       global_message(chan, msg);
       chan->nick[fd] = strdup(nick);
     }

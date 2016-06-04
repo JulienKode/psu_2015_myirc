@@ -1,11 +1,11 @@
 /*
-1;2802;0c** list.c for  in /home/malot_k/Dropbox/Projets/Corewar/ASM
+** list.c for  in /home/malot_k/Dropbox/Projets/Corewar/ASM
 **
 ** Made by kevin malot
 ** Login   <malot_k@epitech.net>
 **
 ** Started on  Wed Mar 18 16:58:42 2015 kevin malot
-** Last update Wed Jun  1 22:32:12 2016 
+** Last update Fri Jun  3 20:59:42 2016
 */
 
 #include <stdlib.h>
@@ -36,6 +36,7 @@ void		create_channel(t_channel *root, int port, char *name, int fd)
   elem->creator = fd;
   elem->port = port;
   memset(elem->fd_type, FD_FREE, MAX_FD);
+  memset(elem->join, 0, MAX_FD);
   elem->name = strdup(name);
   elem->prev = root->prev;
   elem->next = root;
