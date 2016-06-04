@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 16 10:41:14 2016 Julien Karst
-** Last update Sun Jun  5 01:41:13 2016 
+** Last update Sun Jun  5 01:42:19 2016 
 */
 
 #include "irc.h"
@@ -60,7 +60,6 @@ void			client_read(t_client *client)
   int			size;
   FILE			*fp;
   size_t		n;
-  char			line[256];
 
   n = 4096;
 
@@ -79,6 +78,7 @@ void			client_read(t_client *client)
       printf("%s\n", buf);
     }
   /*
+    char			line[256];
     size = 0;
   while (fgets(line, sizeof(line), fp))
     {
