@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 16 10:41:14 2016 Julien Karst
-** Last update Sat Jun  4 13:09:01 2016
+** Last update Sat Jun  4 17:07:04 2016 
 */
 
 #include "irc.h"
@@ -25,20 +25,6 @@ t_cmd                   cmds[] =
     {"QUIT", &cmd_quit},
     {"NAMES", &cmd_names}
   };
-
-void	cmd_send(int fd, t_channel *chan, char *arg_one)
-{
-  (void) fd;
-  (void) chan;
-  (void) arg_one;
-}
-
-void	cmd_accept(int fd, t_channel *chan, char *arg_one)
-{
-  (void) fd;
-  (void) chan;
-  (void) arg_one;
-}
 
 void			parse_cmd(char *buf, t_channel *chan, int fd)
 
