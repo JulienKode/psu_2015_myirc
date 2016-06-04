@@ -82,13 +82,10 @@ static void	print_channel(t_channel *chan, int fd, char *str)
   data->circbuff_read[fd] = 1;
 }
 
-void		cmd_names
-(int fd, t_channel *chan,
- fd_set *fd_write, char *arg_one)
+void		cmd_names(int fd, t_channel *chan, char *arg_one)
 {
   char		*buf;
 
-  (void) fd_write;
   (void) arg_one;
   if (arg_one == NULL)
     print_all_channel(chan, fd);

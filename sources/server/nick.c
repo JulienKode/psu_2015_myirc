@@ -10,13 +10,10 @@
 
 #include	"irc.h"
 
-void		cmd_nick
-(int fd, t_channel *chan,
- fd_set *fd_write, char *nick)
+void		cmd_nick(int fd, t_channel *chan, char *nick)
 {
   char		*msg;
 
-  (void) fd_write;
   printf("FD = %d %p [%s]\n", fd, nick, nick);
   if (nick == NULL)
     dprintf(fd, ":irc.localhost 431 * NICK :No nickname given\r\n");

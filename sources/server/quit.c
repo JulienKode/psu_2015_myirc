@@ -28,12 +28,10 @@ void		client_exit(t_channel *chan, int fd)
   close(fd);
 }
 
-void		cmd_quit(int fd, t_channel *chan, fd_set *fd_write,
-			 char *reason)
+void		cmd_quit(int fd, t_channel *chan, char *reason)
 {
   char		*msg;
 
-  (void) fd_write;
   if (reason != NULL)
     asprintf(&msg, "%s QUIT", chan->nick[fd]);
   else
@@ -82,12 +80,10 @@ void		join_remove_channel(t_channel *chan, char *channel, int fd)
     }
 }
 
-void		cmd_part(int fd, t_channel *chan, fd_set *fd_write,
-			 char *arg_one)
+void		cmd_part(int fd, t_channel *chan, char *arg_one)
 {
   char		*buf;
 
-  (void) fd_write;
   if (arg_one == NULL)
     {
       asprintf(&buf, ":irc.localhost 461 * NICK :Not enough parameters\r\n");

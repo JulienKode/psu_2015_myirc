@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 30 18:14:50 2016
-** Last update Sat Jun  4 14:55:41 2016 
+** Last update Sat Jun  4 14:55:41 2016
 */
 
 #include	"irc.h"
@@ -73,8 +73,7 @@ static void	join_c(int fd, t_channel *chan, char *chan_name, int c)
     }
 }
 
-void		join_set_channel
-(t_channel *chan, char *channel, int fd, int c)
+void		join_set_channel(t_channel *chan, char *channel, int fd, int c)
 {
   char		*msg;
   t_channel	*tmp;
@@ -101,13 +100,10 @@ void		join_set_channel
 }
 
 
-void		cmd_join
-(int fd, t_channel *chan,
- fd_set *fd_write, char *chan_name)
+void		cmd_join(int fd, t_channel *chan, char *chan_name)
 {
   char		*buf;
 
-  (void) fd_write;
   if (chan_name == NULL)
     {
       asprintf(&buf, ":irc.localhost 461 * NICK :Not enough parameters\r\n");

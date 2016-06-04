@@ -5,20 +5,17 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 30 22:35:33 2016
-** Last update Sat Jun  4 15:56:16 2016 
+** Last update Sat Jun  4 15:56:16 2016
 */
 
 #include	"irc.h"
 
-void		cmd_list
-(int fd, t_channel *chan,
- fd_set *fd_write, char *arg_one)
+void		cmd_list(int fd, t_channel *chan, char *arg_one)
 {
   t_channel	*tmp;
   char		*buf;
 
   tmp = chan;
-  (void) fd_write;
   while (tmp->root == 0)
     tmp = tmp->next;
   tmp = tmp->next;

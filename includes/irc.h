@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 16 10:40:15 2016 Julien Karst
-** Last update Sat Jun  4 15:50:46 2016 
+** Last update Sat Jun  4 15:50:46 2016
 */
 
 #ifndef	IRC_H_
@@ -56,7 +56,7 @@ typedef struct		s_channel
 typedef struct		s_cmd
 {
   char			*name;
-  void			(*p)(int, t_channel *, fd_set *, char *);
+  void			(*p)(int, t_channel *, char *);
 }			t_cmd;
 
 extern t_data		*data;
@@ -67,16 +67,16 @@ int			join_channel_exist(t_channel *, char *, int);
 void			join_set_channel(t_channel *, char *, int, int);
 void			global_message(t_channel *, char *);
 void			chan_message(t_channel *, char *);
-void			cmd_nick(int, t_channel *, fd_set *, char *);
-void			cmd_quit(int, t_channel *, fd_set *, char *);
-void			cmd_list(int, t_channel *, fd_set *, char *);
-void			cmd_join(int, t_channel *, fd_set *, char *);
-void			cmd_part(int, t_channel *, fd_set *, char *);
-void			cmd_users(int, t_channel *, fd_set *, char *);
-void			cmd_msg(int, t_channel *, fd_set *, char *);
-void			cmd_send(int, t_channel *, fd_set *, char *);
-void			cmd_accept(int, t_channel *, fd_set *, char *);
-void			cmd_names(int, t_channel *, fd_set *, char *);
+void			cmd_nick(int, t_channel *, char *);
+void			cmd_quit(int, t_channel *, char *);
+void			cmd_list(int, t_channel *, char *);
+void			cmd_join(int, t_channel *, char *);
+void			cmd_part(int, t_channel *, char *);
+void			cmd_users(int, t_channel *, char *);
+void			cmd_msg(int, t_channel *, char *);
+void			cmd_send(int, t_channel *, char *);
+void			cmd_accept(int, t_channel *, char *);
+void			cmd_names(int, t_channel *, char *);
 void			create_channel(t_channel *, int, char *, int);
 void			client_exit(t_channel *, int);
 int			send_user(t_channel*, char*, char*);

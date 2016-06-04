@@ -5,13 +5,12 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 30 22:48:45 2016
-** Last update Sat Jun  4 14:58:24 2016 
+** Last update Sat Jun  4 14:58:24 2016
 */
 
 #include	"irc.h"
 
-static void	msg_error
-(t_channel *chan, int fd, char *arg_one)
+static void	msg_error(t_channel *chan, int fd, char *arg_one)
 {
   char		*msg;
 
@@ -47,15 +46,12 @@ static int	msg_gere_error
   return (1);
 }
 
-void		cmd_msg
-(int fd, t_channel *chan,
- fd_set *fd_write, char *arg_one)
+void		cmd_msg(int fd, t_channel *chan, char *arg_one)
 {
   t_channel	*tmp;
   char		*datas;
   char		*msg;
 
-  (void) fd_write;
   datas = strtok(NULL, " \t");
   if (msg_gere_error(chan, arg_one, datas, fd) == 0)
     return;
