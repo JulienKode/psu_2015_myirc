@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 16 10:40:15 2016 Julien Karst
-** Last update Sat Jun  4 17:30:02 2016 
+** Last update Sat Jun  4 17:52:33 2016 
 */
 
 #ifndef			IRC_H_
@@ -34,12 +34,6 @@
 
 typedef void		(*fct)();
 
-typedef struct		s_data
-{
-  int			circbuff_read[MAX_FD];
-  t_circbuff		circbuff[MAX_FD];
-}			t_data;
-
 typedef struct		s_channel
 {
   int			creator;
@@ -53,6 +47,13 @@ typedef struct		s_channel
   struct s_channel	*prev;
   struct s_channel	*next;
 }			t_channel;
+
+typedef struct		s_data
+{
+  int			circbuff_read[MAX_FD];
+  t_circbuff		circbuff[MAX_FD];
+  t_channel		*chan;
+}			t_data;
 
 typedef struct		s_cmd
 {

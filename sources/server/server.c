@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 16 10:41:14 2016 Julien Karst
-** Last update Sat Jun  4 17:39:03 2016 
+** Last update Sat Jun  4 17:54:09 2016 
 */
 
 #include "irc.h"
@@ -181,6 +181,7 @@ t_channel		*init_channels(int port)
   chan = init_list();
   create_channel(chan, port, "Accueil", -1);
   add_server(chan);
+  data->chan = chan->next;
   return (chan);
 }
 
