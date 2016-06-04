@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 16 10:40:15 2016 Julien Karst
-** Last update Sat Jun  4 17:30:02 2016
+** Last update Sat Jun  4 19:39:06 2016 
 */
 
 #ifndef			IRC_H_
@@ -28,6 +28,7 @@
 #include		<string.h>
 #include		<stdlib.h>
 #include		<unistd.h>
+#include		<netdb.h>
 #include		"utils_circbuff.h"
 #include		<signal.h>
 
@@ -93,6 +94,16 @@ void			cmd_accept(int, t_channel *, char *);
 void			cmd_names(int, t_channel *, char *);
 void			create_channel(t_channel *, int, char *, int);
 void			client_exit(t_channel *, int);
+void			client_nick(t_client*, char*, char*);
+void			client_list(t_client*, char*, char*);
+void			client_join(t_client*, char*, char*);
+void			client_part(t_client*, char*, char*);
+void			client_users(t_client*, char*, char*);
+void			client_msg(t_client*, char*, char*);
+void			client_quit(t_client*, char*, char*);
+void			client_help(t_client*, char*, char*);
+void			client_send(t_client*, char*, char*);
+void			client_accept(t_client*, char*, char*);
 t_channel		*found_channel_by_name(t_channel *, char *);
 t_channel		*init_list();
 void			client_server(t_client *, char*, char *);

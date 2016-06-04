@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 16 10:41:14 2016 Julien Karst
-** Last update Wed Jun  1 22:17:29 2016
+** Last update Sat Jun  4 19:32:18 2016 
 */
 
 #include "irc.h"
@@ -13,16 +13,16 @@
 t_cmd                   cmds[] =
   {
     {"/server", &client_server},
-    /* {"/nick", &client_nick}, */
-    /* {"/list", &client_list}, */
-    /* {"/join", &client_join}, */
-    /* {"/part", &client_part}, */
-    /* {"/users", &client_users}, */
-    /* {"/msg", &client_msg}, */
-    /* {"/send_file", &client_send}, */
-    /* {"/accept_file", &client_accept}, */
-    /* {"/help", &client_help}, */
-    /* {"/quit", &client_quit}, */
+    {"/nick", &client_nick},
+    {"/list", &client_list},
+    {"/join", &client_join},
+    {"/part", &client_part},
+    {"/users", &client_users},
+    {"/msg", &client_msg},
+    {"/send_file", &client_send},
+    {"/accept_file", &client_accept},
+    {"/help", &client_help},
+    {"/quit", &client_quit}
   };
 
 void			parse_cmd(t_client *client, char *buf)

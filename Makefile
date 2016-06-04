@@ -5,7 +5,7 @@
 ## Login   <malot_k@epitech.net>
 ## 
 ## Started on  Sun Nov 23 10:06:19 2014 kevin malot
-## Last update Sat Jun  4 17:39:13 2016 
+## Last update Sat Jun  4 19:33:15 2016 
 ##
 
 CFLAGS          += -W -Wall -Wextra -Werror -Iincludes -g
@@ -34,7 +34,9 @@ SRC_SERVER	= 	sources/server/server.c 		\
 			sources/utils/circbuff/circbuff.c	\
 			sources/server/list.c
 
-SRC_CLIENT	= sources/client/client.c
+SRC_CLIENT	= 	sources/client/client.c			\
+			sources/client/cmd.c			\
+			sources/client/cmd_2.c
 
 OBJ_SERVER	= $(SRC_SERVER:.c=.o)
 
