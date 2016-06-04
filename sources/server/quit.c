@@ -14,6 +14,8 @@ void		client_exit(t_channel *chan, int fd)
 {
   t_channel	*tmp;
 
+  memset(data->circbuff[fd].buffer, 0, 1024);
+  data->circbuff_read[fd] = 0;
   tmp = chan;
   while (tmp->root == 0)
     tmp = tmp->next;
@@ -21,8 +23,6 @@ void		client_exit(t_channel *chan, int fd)
   while (tmp->root == 0)
     {
       tmp->fd_type[fd] = FD_FREE;
-      memset(tmp->circbuff[fd].buffer, 0, 1024);
-      tmp->circbuff_read[fd] = 0;
       tmp = tmp->next;
     }
   close(fd);
@@ -35,15 +35,9 @@ void		cmd_quit(int fd, t_channel *chan, fd_set *fd_write,
 
   (void) fd_write;
   if (reason != NULL)
-    msg = malloc(strlen(chan->nick[fd]) + 8 + strlen(reason));
+    asprintf(&msg, "%s QUIT", chan->nick[fd]);
   else
-    msg = malloc(strlen(chan->nick[fd]) + 8);
-  if (msg == NULL)
-    return;
-  msg = strcpy(msg, chan->nick[fd]);
-  msg = strcat(msg, " QUIT ");
-  if (reason != NULL)
-    msg = strcat(msg, reason);
+    asprintf(&msg, "%s QUIT :%s", chan->nick[fd], reason);
   global_message(chan, msg);
   client_exit(chan, fd);
 }
@@ -65,38 +59,48 @@ void		join_remove_channel(t_channel *chan, char *channel, int fd)
 	{
 	  valid = 1;
 	  if (tmp->fd_type[fd] == FD_FREE)
-	    dprintf(fd, ":irc.localhost 442 * channel "
-":You're not on that channel !\r\n");
+	    {
+	      asprintf(&msg, ":irc.localhost 442 * channel "
+		       ":You're not on that channel !\r\n");
+	      circbuff_write(&(data->circbuff[fd]), msg);
+	      data->circbuff_read[fd] = 1;
+	    }
 	  else
 	    {
-	      tmp->fd_type[fd] = FD_FREE;
-	      msg = malloc(7 + strlen(chan->nick[fd]) + strlen(channel));
-	      if (msg == NULL)
-		return;
-	      msg = strcpy(msg, chan->nick[fd]);
-	      msg = strcat(msg, " PART ");
-	      msg = strcat(msg, channel);
+	      asprintf(&msg, "%s PART %s", chan->nick[fd], channel);
 	      chan_message(chan, msg);
+	      tmp->fd_type[fd] = FD_FREE;
 	    }
 	}
       tmp = tmp->next;
     }
   if (valid == 0)
-    dprintf(fd, ":irc.localhost 403 * %s: No such channel\r\n", channel);
+    {
+      asprintf(&msg, ":irc.localhost 403 * %s: No such channel\r\n", channel);
+      circbuff_write(&(data->circbuff[fd]), msg);
+      data->circbuff_read[fd] = 1;
+    }
 }
 
 void		cmd_part(int fd, t_channel *chan, fd_set *fd_write,
 			 char *arg_one)
 {
+  char		*buf;
+
   (void) fd_write;
-  printf("Arg : %s\n", arg_one);
   if (arg_one == NULL)
-    dprintf(fd, ":irc.localhost 461 * NICK :Not enough parameters\r\n");
-  else if (strcmp(arg_one, "Accueil") == 0)
-    dprintf(fd, ":irc.localhost 403 * Accueil: No such channel\r\n");
-  else
     {
-      join_remove_channel(chan, arg_one, fd);
-      join_set_channel(chan, "Accueil", fd, 0);
+      asprintf(&buf, ":irc.localhost 461 * NICK :Not enough parameters\r\n");
+      circbuff_write(&(data->circbuff[fd]), buf);
+      data->circbuff_read[fd] = 1;
     }
+  else if (strcmp(arg_one, "Accueil") == 0)
+    {
+      asprintf(&buf, ":irc.localhost 403 * Accueil:"
+	       " Can't leave the main channel\r\n");
+      circbuff_write(&(data->circbuff[fd]), buf);
+      data->circbuff_read[fd] = 1;
+    }
+  else
+    join_remove_channel(chan, arg_one, fd);
 }

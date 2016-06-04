@@ -5,24 +5,14 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 30 21:07:04 2016
-** Last update Sat Jun  4 14:22:03 2016 
+** Last update Sat Jun  4 14:22:03 2016
 */
 
 #include	"irc.h"
 
 void		global_message(t_channel *chan, char *msg)
 {
-  t_channel	*tmp;
-
-  tmp = chan;
-  while (tmp->root == 0)
-    tmp = tmp->next;
-  tmp = tmp->next;
-  while (tmp->root == 0)
-    {
-      chan_message(tmp, msg);
-      tmp = tmp->next;
-    }
+  chan_message(found_channel_by_name(chan, "Accueil"), msg);
 }
 
 void		chan_message(t_channel *chan, char *msg)
@@ -31,17 +21,17 @@ void		chan_message(t_channel *chan, char *msg)
   char		*buf;
 
   i = 0;
-  buf = NULL;
+  asprintf(&buf, ":%s\r\n", msg);
   while (i < MAX_FD)
     {
       if (chan->fd_type[i] == FD_CLIENT)
 	{
-	  asprintf(&buf, ":%s\r\n", msg);
-	  circbuff_write(&(chan->circbuff[i]), buf);
-	  chan->circbuff_read[i] = 1;
+	  circbuff_write(&(data->circbuff[i]), buf);
+	  data->circbuff_read[i] = 1;
 	}
       i++;
     }
+  free(buf);
 }
 
 int		send_user(t_channel *chan, char *user, char *msg)
@@ -49,24 +39,17 @@ int		send_user(t_channel *chan, char *user, char *msg)
   int		i;
   t_channel	*tmp;
 
-  tmp = chan;
-  while (tmp->root == 0)
-    tmp = tmp->next;
-  tmp = tmp->next;
-  while (tmp->root == 0)
+  tmp = found_channel_by_name(chan, "Accueil");
+  i = -1;
+  while (++i < MAX_FD)
     {
-      i = -1;
-      while (++i < MAX_FD)
+      printf("[%s][%s]\n", tmp->nick[i], user); // Debug
+      if (tmp->nick[i] && strcmp(tmp->nick[i], user) == 0)
 	{
-	  printf("[%s][%s]\n", tmp->nick[i], user);
-	  if (tmp->nick[i] && strcmp(tmp->nick[i], user) == 0)
-	    {
-	      circbuff_write(&(tmp->circbuff[i]), msg);
-	      tmp->circbuff_read[i] = 1;
-	      return (1);
-	    }
+	  circbuff_write(&(data->circbuff[i]), msg);
+	  data->circbuff_read[i] = 1;
+	  return (1);
 	}
-      tmp = tmp->next;
     }
   return (0);
 }

@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 30 18:14:50 2016
-** Last update Fri Jun  3 00:22:00 2016 
+** Last update Fri Jun  3 00:22:00 2016
 */
 
 #include	"irc.h"
@@ -32,30 +32,48 @@ int		join_channel_exist(t_channel *chan, char *channel, int fd)
 
 static void	join_c(int fd, t_channel *chan, char *chan_name, int c)
 {
+  char		*buf;
+
   if (chan->join[fd] == 0 && c != 0)
     {
       chan->join[fd] = 1;
-      dprintf(fd, ":%s!~%s@localhost JOIN :%s\r\n",
-	      chan->nick[fd] , chan->nick[fd], chan_name);
+      asprintf(&buf, ":%s!~%s@localhost JOIN :%s\r\n",
+	       chan->nick[fd] , chan->nick[fd], chan_name);
+      circbuff_write(&(data->circbuff[fd]), buf);
+      data->circbuff_read[fd] = 1;
       if (c == 1)
 	{
-	  dprintf(fd, ":irc.localhost MODE %s +nt\r\n"
+	  asprintf(&buf, ":irc.localhost MODE %s +nt\r\n"
 		  ":irc.localhost 353 %s = %s :@%s",
 		  chan_name, chan->nick[fd], chan_name, chan->nick[fd]);
+	  circbuff_write(&(data->circbuff[fd]), buf);
+	  data->circbuff_read[fd] = 1;
 	}
       else
 	{
-	  dprintf(fd, ":irc.localhost 353 %s = %s :%s",
+	  asprintf(&buf, ":irc.localhost 353 %s = %s :%s",
 		  chan->nick[fd], chan_name, chan->nick[fd]);
+	  circbuff_write(&(data->circbuff[fd]), buf);
+	  data->circbuff_read[fd] = 1;
 	  while (++c < MAX_FD)
 	    if (chan->fd_type[c] != FD_FREE && c != chan->creator
 		&& c != fd)
-	      dprintf(fd, " %s", chan->nick[c]);
+	      {
+		asprintf(&buf, " %s", chan->nick[c]);
+		circbuff_write(&(data->circbuff[fd]), buf);
+		data->circbuff_read[fd] = 1;
+	      }
 	  if (chan->fd_type[chan->creator] != FD_FREE)
-	    dprintf(fd, " @%s", chan->nick[chan->creator]);
+	    {
+	      asprintf(&buf, " @%s", chan->nick[chan->creator]);
+	      circbuff_write(&(data->circbuff[fd]), buf);
+	      data->circbuff_read[fd] = 1;
+	    }
 	}
-      dprintf(fd, "\r\n:irc.localhost 366 %s %s :End of /NAMES list.\r\n",
+      asprintf(&buf, "\r\n:irc.localhost 366 %s %s :End of /NAMES list.\r\n",
 	      chan->nick[fd], chan_name);
+      circbuff_write(&(data->circbuff[fd]), buf);
+      data->circbuff_read[fd] = 1;
     }
 }
 
@@ -76,9 +94,7 @@ void		join_set_channel
 	  tmp->nick[fd] = chan->nick[fd];
 	  tmp->fd_type[fd] = chan->fd_type[fd];
 	  tmp->fct_read[fd] = chan->fct_read[fd];
-	  msg = malloc((21 + (2*strlen(tmp->nick[fd]))
-			+ strlen(channel)) * sizeof(char));
-	  sprintf(msg, ":%s!~%s@localhost JOIN :%s",
+	  asprintf(&msg, "%s!~%s@localhost JOIN :%s",
 		  tmp->nick[fd], tmp->nick[fd], channel);
 	  chan_message(tmp, msg);
 	  join_c(fd, tmp, channel, c);
@@ -93,11 +109,21 @@ void		cmd_join
 (int fd, t_channel *chan,
  fd_set *fd_write, char *chan_name)
 {
+  char		*buf;
+
   (void) fd_write;
   if (chan_name == NULL)
-    dprintf(fd, ":irc.localhost 461 * NICK :Not enough parameters\r\n");
+    {
+      asprintf(&buf, ":irc.localhost 461 * NICK :Not enough parameters\r\n");
+      circbuff_write(&(data->circbuff[fd]), buf);
+      data->circbuff_read[fd] = 1;
+    }
   else if (chan_name[0] != '#')
-    dprintf(fd, ":irc.localhost 433 * %s :Illegal channel name\r\n", chan_name);
+    {
+      asprintf(&buf, ":irc.localhost 433 * %s :Illegal channel name\r\n", chan_name);
+      circbuff_write(&(data->circbuff[fd]), buf);
+      data->circbuff_read[fd] = 1;
+    }
   else
     {
       if (join_channel_exist(chan, chan_name, fd) == 1)

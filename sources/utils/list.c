@@ -28,20 +28,15 @@ t_channel	*init_list()
 
 void		create_channel(t_channel *root, int port, char *name, int fd)
 {
-  int		i;
   t_channel	*elem;
 
-  i = -1;
   if ((elem = malloc(sizeof(t_channel))) == NULL)
     exit(42);
   elem->root = 0;
   elem->creator = fd;
   elem->port = port;
-  while (++i < MAX_FD)
-    elem->circbuff[i] = circbuff_create(1024);
   memset(elem->fd_type, FD_FREE, MAX_FD);
   memset(elem->join, 0, MAX_FD);
-  memset(elem->circbuff_read, 0, MAX_FD);
   elem->name = strdup(name);
   elem->prev = root->prev;
   elem->next = root;

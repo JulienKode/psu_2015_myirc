@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 16 10:40:15 2016 Julien Karst
-** Last update Sat Jun  4 14:24:17 2016 
+** Last update Sat Jun  4 14:24:17 2016
 */
 
 #ifndef	IRC_H_
@@ -17,6 +17,7 @@
 #define FD_SERVER 2
 #define MAX_FD 255
 #define CMD_NUMBER 10
+#define _GNU_SOURCE
 
 #include <sys/select.h>
 #include <sys/time.h>
@@ -32,14 +33,18 @@
 
 typedef void		(*fct)();
 
+typedef struct		s_data
+{
+  int			circbuff_read[MAX_FD];
+  t_circbuff		circbuff[MAX_FD];
+}			t_data;
+
 typedef struct		s_channel
 {
   int			creator;
   int			root;
   int			port;
   char			*name;
-  int			circbuff_read[MAX_FD];
-  t_circbuff		circbuff[MAX_FD];
   int			join[MAX_FD];
   char			fd_type[MAX_FD];
   fct			fct_read[MAX_FD];
@@ -54,11 +59,11 @@ typedef struct		s_cmd
   void			(*p)(int, t_channel *, fd_set *, char *);
 }			t_cmd;
 
-int			send_user(t_channel*, char*, char*);
-void			client_write(t_channel*, int);
-int			nick_exists(t_channel *, char *);
-void			join_set_channel(t_channel *, char *, int, int);
+extern t_data		*data;
+
+void			client_write(int);
 int			join_channel_exist(t_channel *, char *, int);
+void			join_set_channel(t_channel *, char *, int, int);
 void			global_message(t_channel *, char *);
 void			chan_message(t_channel *, char *);
 void			cmd_nick(int, t_channel *, fd_set *, char *);
@@ -73,6 +78,8 @@ void			cmd_accept(int, t_channel *, fd_set *, char *);
 void			cmd_names(int, t_channel *, fd_set *, char *);
 void			create_channel(t_channel *, int, char *, int);
 void			client_exit(t_channel *, int);
+int			send_user(t_channel*, char*, char*);
+int			nick_exists(t_channel *, char *);
 t_channel		*found_channel_by_name(t_channel *, char *);
 t_channel		*init_list();
 
