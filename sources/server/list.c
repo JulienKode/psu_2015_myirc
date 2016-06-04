@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 30 22:35:33 2016
-** Last update Thu Jun  2 17:05:01 2016
+** Last update Sat Jun  4 15:56:16 2016 
 */
 
 #include	"irc.h"
@@ -28,17 +28,19 @@ void		cmd_list
   data->circbuff_read[fd] = 1;
   while (tmp->root == 0)
     {
-      if (arg_one && tmp->name && strstr(tmp->name, arg_one) != NULL)
+      if (arg_one && tmp->name
+	  && tmp->name[0] == '#' && strstr(tmp->name, arg_one) != NULL)
 	{
-	  asprintf(&buf, ":irc.localhost 322 %s %s 1 :\r\n",
-		   chan->nick[fd], tmp->name);
+	  asprintf(&buf, ":irc.localhost 322 %s %s %d :\r\n",
+		   chan->nick[fd], tmp->name, nb_of_users(tmp));
 	  circbuff_write(&(data->circbuff[fd]), buf);
 	  data->circbuff_read[fd] = 1;
 	}
-      else if (tmp->name && arg_one == NULL)
+      else if (tmp->name && tmp->name[0] == '#'
+	       && arg_one == NULL)
 	{
-	  asprintf(&buf, ":irc.localhost 322 %s %s 1 :\r\n", chan->nick[fd],
-		   tmp->name);
+	  asprintf(&buf, ":irc.localhost 322 %s %s %d :\r\n", chan->nick[fd],
+		   tmp->name, nb_of_users(tmp));
 	  circbuff_write(&(data->circbuff[fd]), buf);
 	  data->circbuff_read[fd] = 1;
 	}

@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 16 10:40:15 2016 Julien Karst
-** Last update Sat Jun  4 14:24:17 2016
+** Last update Sat Jun  4 15:50:46 2016 
 */
 
 #ifndef	IRC_H_
@@ -61,6 +61,7 @@ typedef struct		s_cmd
 
 extern t_data		*data;
 
+int			nb_of_users(t_channel*);
 void			client_write(int);
 int			join_channel_exist(t_channel *, char *, int);
 void			join_set_channel(t_channel *, char *, int, int);
