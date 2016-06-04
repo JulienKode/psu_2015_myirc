@@ -44,7 +44,7 @@ void		cmd_users
     {
       if (tmp->fd_type[i] == FD_CLIENT)
 	{
-	  asprintf(&buf, ":irc.localhost :%s\r\n", tmp->nick[i]);
+	  asprintf(&buf, ":irc.localhost 393 :%s\r\n", tmp->nick[i]);
 	  circbuff_write(&(data->circbuff[fd]), buf);
 	  data->circbuff_read[fd] = 1;
 	}
