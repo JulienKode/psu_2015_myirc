@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 16 10:40:15 2016 Julien Karst
-** Last update Sat Jun  4 19:39:06 2016 
+** Last update Sat Jun  4 22:38:39 2016 
 */
 
 #ifndef			IRC_H_
@@ -63,9 +63,13 @@ typedef struct		s_cmd
 
 typedef struct		s_client
 {
+  int			root;
+  struct s_client	*prev;
+  struct s_client	*next;
+  int			fd_type;
+  int			circbuff_r;
+  t_circbuff		circbuff;
   int			fd;
-  fd_set		fd_read;
-  fd_set		fd_write;
   struct sockaddr_in	sin;
   socklen_t		len;
 }			t_client;
@@ -78,6 +82,7 @@ int			nb_of_users(t_channel*);
 int			join_channel_exist(t_channel *, char *, int);
 void			signal_handler(int);
 void			send_buff(int, char*);
+void			send_buff_client(t_client*, char*);
 void			client_write(int);
 void			join_set_channel(t_channel *, char *, int, int);
 void			global_message(t_channel *, char *);
@@ -104,8 +109,10 @@ void			client_quit(t_client*, char*, char*);
 void			client_help(t_client*, char*, char*);
 void			client_send(t_client*, char*, char*);
 void			client_accept(t_client*, char*, char*);
+void			client_server(t_client *, char*, char *);
+void			create_client(t_client*, int);
 t_channel		*found_channel_by_name(t_channel *, char *);
 t_channel		*init_list();
-void			client_server(t_client *, char*, char *);
+t_client		*init_list_client();
 
 #endif			/* IRC_H_ */
