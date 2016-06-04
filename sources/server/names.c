@@ -5,47 +5,52 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Wed Jun  1 22:20:54 2016  Julien Karst
-** Last update Fri Jun  3 00:43:00 2016
+** Last update Sat Jun  4 16:56:45 2016 
 */
 
 #include	"irc.h"
 
-static void	print_all_channel(t_channel *chan, int fd)
+static void	add_user(t_channel *tmp, int fd, int c)
 {
-  int		c;
-  t_channel     *tmp;
   char		*buf;
 
-  tmp = chan;
+  asprintf(&buf, " %s", tmp->nick[c]);
+  send_buff(fd, buf);
+}
+
+static void	print_channel_loop(t_channel *tmp, int fd)
+{
+  char		*buf;
+  int		c;
+
   c = -1;
+  asprintf(&buf, ":irc.localhost 353 %s = %s :%s",
+	   tmp->nick[fd], tmp->name, tmp->nick[fd]);
+  send_buff(fd, buf);
+  while (++c < MAX_FD)
+    if (tmp->fd_type[c] != FD_FREE && c != tmp->creator && c != fd)
+      add_user(tmp, fd, c);
+  if (tmp->fd_type[tmp->creator] != FD_FREE)
+    {
+      asprintf(&buf, " @%s", tmp->nick[tmp->creator]);
+      send_buff(fd, buf);
+    }
+  asprintf(&buf, "\r\n");
+  send_buff(fd, buf);
+}
+
+static void	print_all_channel(t_channel *chan, int fd)
+{
+  t_channel     *tmp;
+
+  tmp = chan;
   while (tmp->root == 0)
     tmp = tmp->next;
   tmp = tmp->next;
   while (tmp->root == 0)
     {
       if (tmp->name[0] == '#' && tmp->fd_type[fd] != FD_FREE)
-	{
-	  asprintf(&buf, ":irc.localhost 353 %s = %s :%s",
-		  tmp->nick[fd], tmp->name, tmp->nick[fd]);
-	  circbuff_write(&(data->circbuff[fd]), buf);
-	  data->circbuff_read[fd] = 1;
-	  while (++c < MAX_FD)
-	    if (tmp->fd_type[c] != FD_FREE && c != tmp->creator && c != fd)
-	      {
-		asprintf(&buf, " %s", tmp->nick[c]);
-		circbuff_write(&(data->circbuff[fd]), buf);
-		data->circbuff_read[fd] = 1;
-	      }
-	  if (tmp->fd_type[tmp->creator] != FD_FREE)
-	    {
-	      asprintf(&buf, " @%s",  tmp->nick[tmp->creator]);
-	      circbuff_write(&(data->circbuff[fd]), buf);
-	      data->circbuff_read[fd] = 1;
-	    }
-	  asprintf(&buf, "\r\n");
-	  circbuff_write(&(data->circbuff[fd]), buf);
-	  data->circbuff_read[fd] = 1;
-	}
+	print_channel_loop(tmp, fd);
       tmp = tmp->next;
     }
 }
@@ -62,24 +67,20 @@ static void	print_channel(t_channel *chan, int fd, char *str)
     return;
   asprintf(&buf, ":irc.localhost 353 %s = %s :%s",
 	  tmp->nick[fd], tmp->name, tmp->nick[fd]);
-  circbuff_write(&(data->circbuff[fd]), buf);
-  data->circbuff_read[fd] = 1;
+  send_buff(fd, buf);
   while (++c < MAX_FD)
     if (tmp->fd_type[c] != FD_FREE && c != tmp->creator && c != fd)
       {
 	asprintf(&buf, " %s", tmp->nick[c]);
-	circbuff_write(&(data->circbuff[fd]), buf);
-	data->circbuff_read[fd] = 1;
+	send_buff(fd, buf);
       }
   if (tmp->fd_type[tmp->creator] != FD_FREE)
     {
       asprintf(&buf, " @%s",  tmp->nick[tmp->creator]);
-      circbuff_write(&(data->circbuff[fd]), buf);
-      data->circbuff_read[fd] = 1;
+      send_buff(fd, buf);
     }
   asprintf(&buf, "\r\n");
-  circbuff_write(&(data->circbuff[fd]), buf);
-  data->circbuff_read[fd] = 1;
+  send_buff(fd, buf);
 }
 
 void		cmd_names(int fd, t_channel *chan, char *arg_one)
@@ -93,6 +94,5 @@ void		cmd_names(int fd, t_channel *chan, char *arg_one)
     print_channel(chan, fd, arg_one);
   asprintf(&buf, ":irc.localhost 366 %s * "
 	   ":End of /NAMES list.\r\n", chan->nick[fd]);
-  circbuff_write(&(data->circbuff[fd]), buf);
-  data->circbuff_read[fd] = 1;
+  send_buff(fd, buf);
 }

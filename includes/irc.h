@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 16 10:40:15 2016 Julien Karst
-** Last update Sat Jun  4 15:50:46 2016
+** Last update Sat Jun  4 16:54:50 2016 
 */
 
 #ifndef	IRC_H_
@@ -61,9 +61,12 @@ typedef struct		s_cmd
 
 extern t_data		*data;
 
+int			send_user(t_channel*, char*, char*);
+int			nick_exists(t_channel *, char *);
 int			nb_of_users(t_channel*);
-void			client_write(int);
 int			join_channel_exist(t_channel *, char *, int);
+void			send_buff(int, char*);
+void			client_write(int);
 void			join_set_channel(t_channel *, char *, int, int);
 void			global_message(t_channel *, char *);
 void			chan_message(t_channel *, char *);
@@ -79,9 +82,7 @@ void			cmd_accept(int, t_channel *, char *);
 void			cmd_names(int, t_channel *, char *);
 void			create_channel(t_channel *, int, char *, int);
 void			client_exit(t_channel *, int);
-int			send_user(t_channel*, char*, char*);
-int			nick_exists(t_channel *, char *);
 t_channel		*found_channel_by_name(t_channel *, char *);
 t_channel		*init_list();
 
-#endif	/* IRC_H_ */
+#endif			/* IRC_H_ */
