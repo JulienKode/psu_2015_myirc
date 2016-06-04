@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 16 10:41:14 2016 Julien Karst
-** Last update Sat Jun  4 23:18:00 2016 
+** Last update Sun Jun  5 01:41:13 2016 
 */
 
 #include "irc.h"
@@ -58,20 +58,46 @@ void			client_read(t_client *client)
 {
   char			*buf;
   int			size;
+  FILE			*fp;
   size_t		n;
+  char			line[256];
 
   n = 4096;
+
   buf = NULL;
+  fp = fdopen(client->fd, "r");
   printf("Strct %p\n", client);
-  if ((size = getline(&buf, &n, stdin)) > 0)
+  if ((size = getline(&buf, &n, fp)) > 0)
     {
-      buf[size - 1] = 0;
-      printf("Get some data [%s]\n", buf);
       if (buf[0] == '/')
-	parse_cmd(client, buf);
+	{
+	  buf[size - 1] = 0;
+	  parse_cmd(client, buf);
+	}
       else
-	dprintf(client->fd, "%s\r\n", buf);
+	  circbuff_write(&(client->circbuff), buf);
+      printf("%s\n", buf);
     }
+  /*
+    size = 0;
+  while (fgets(line, sizeof(line), fp))
+    {
+      printf("Buff[%s]Line[%s]\n", buf, line);
+      if (size == 0)
+	asprintf(&buf, "%s", line);
+      else
+	asprintf(&buf, "%s%s", buf, line);
+      size++;
+    }
+  printf("BuffFinal[%s]\n", buf);
+  if (buf[0] == '/')
+    parse_cmd(client, buf);
+  else
+    {
+      buf[strlen(buf) - 1] = 0;
+      printf("Get some data {%d}[%s]\n", (int)size, buf);
+    }
+  */
 }
 
 void			client_server(t_client *tmp, char *ip, char *port)
@@ -156,6 +182,7 @@ void			fd_action_client
       	client_read(tmp);
       if (FD_ISSET(tmp->fd, fd_write) && tmp->fd != 0)
 	{
+	  printf("Action \n");
 	  fp = fdopen(tmp->fd, "r");
 	  size = getline(&buf, &n, fp);
 	  if (size > 0)
