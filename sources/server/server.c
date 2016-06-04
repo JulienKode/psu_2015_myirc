@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 16 10:41:14 2016 Julien Karst
-** Last update Sat Jun  4 17:07:04 2016 
+** Last update Sat Jun  4 17:07:04 2016
 */
 
 #include "irc.h"
@@ -31,11 +31,10 @@ void			parse_cmd(char *buf, t_channel *chan, int fd)
 {
   char			*cmd;
   char			*arg_one;
-  int			i;
-  int			valid;
   char			*tmp;
+  int			valid;
+  int			i;
 
-  buf[strlen(buf) - 1] = 0;
   cmd = strtok(buf, " \t");
   arg_one = strtok(NULL, " \t");
   i = 0;
@@ -53,8 +52,7 @@ void			parse_cmd(char *buf, t_channel *chan, int fd)
     {
       asprintf(&tmp, ":irc.localhost %s %s :Unknown command\r\n",
 	       chan->nick[fd], cmd);
-      circbuff_write(&(data->circbuff[fd]), tmp);
-      data->circbuff_read[fd] = 1;
+      send_buff(fd, tmp);
     }
 }
 
@@ -71,7 +69,7 @@ void			client_read(t_channel *chan, int fd)
   buf = NULL;
   if ((size = getline(&buf, &n, fp)) > 1)
     {
-      buf[size - 1] = 0;
+      buf[size - 2] = 0;
       parse_cmd(buf, chan, fd);
     }
   else
@@ -126,72 +124,94 @@ void			add_server(t_channel *chan)
   data->circbuff_read[s] = 0;
 }
 
+void			init_fd_set(t_channel *chan, fd_set *fd_read,
+				    fd_set *fd_write)
+{
+  t_channel		*tmp;
+  int			i;
+
+  tmp = found_channel_by_name(chan, "Accueil");
+  FD_ZERO(fd_read);
+  FD_ZERO(fd_write);
+  FD_SET(3, fd_read);
+  while (tmp->root == 0)
+    {
+      i = 0;
+      while (i < MAX_FD)
+	{
+	  if (tmp->fd_type[i] == FD_CLIENT)
+	    {
+	      FD_SET(i, fd_read);
+	      if (data->circbuff_read[i])
+		FD_SET(i, fd_write);
+	    }
+	  i++;
+	}
+      tmp = tmp->next;
+    }
+}
+
+void			fd_action(t_channel *chan, fd_set *fd_read,
+				  fd_set *fd_write)
+{
+  t_channel		*tmp;
+  int			fd_ok[MAX_FD];
+  int			j;
+
+  tmp = found_channel_by_name(chan, "Accueil");
+  memset(fd_ok, 0, MAX_FD);
+  while (tmp->root == 0)
+    {
+      j = -1;
+      while (++j < MAX_FD)
+	{
+	  if (fd_ok[j] == 0 && tmp->fd_type[j] != FD_FREE)
+	    {
+	      if (FD_ISSET(j, fd_read) && (fd_ok[j] = 1))
+		tmp->fct_read[j](tmp, j);
+	      else if (FD_ISSET(j, fd_write) && (fd_ok[j] = 1))
+		client_write(j);
+	    }
+	}
+      tmp = tmp->next;
+    }
+}
+
+t_channel		*init_channels(int port)
+{
+  t_channel		*chan;
+
+  chan = init_list();
+  create_channel(chan, port, "Accueil", -1);
+  add_server(chan);
+  return (chan);
+}
+
 int			main(int ac, char **argv)
 {
   t_channel		*chan;
-  int			i;
-  int			j;
   fd_set		fd_read;
   fd_set		fd_write;
-  int			fd_ok[MAX_FD];
   t_data		main_data;
 
-  i = -1;
-  while (++i < MAX_FD)
-    main_data.circbuff[i] = circbuff_create(1024);
-  memset(main_data.circbuff_read, 0, MAX_FD);
-  data = &main_data;
   if (ac != 2)
     {
       printf("Usage : ./server [port]\n");
       return (1);
     }
-  chan = init_list();
-  create_channel(chan, atoi(argv[1]), "Accueil", -1);
-  add_server(chan);
+  signal(SIGINT, signal_handler);
+  ac = -1;
+  while (++ac < MAX_FD)
+    main_data.circbuff[ac] = circbuff_create(1024);
+  memset(main_data.circbuff_read, 0, MAX_FD);
+  data = &main_data;
+  chan = init_channels(atoi(argv[1]));
   while (42)
     {
-      chan = chan->next;
-      FD_ZERO(&fd_read);
-      FD_ZERO(&fd_write);
-      FD_SET(3, &fd_read);
-      while (chan->root == 0)
-	{
-	  for (i = 0; i < MAX_FD; i++)
-	    if (chan->fd_type[i] == FD_CLIENT)
-	      {
-		FD_SET(i, &fd_read);
-		if (data->circbuff_read[i])
-		  FD_SET(i, &fd_write);
-	      }
-	  chan = chan->next;
-	}
-      chan = chan->next;
+      init_fd_set(chan, &fd_read, &fd_write);
       if (select(MAX_FD + 1, &fd_read, &fd_write, NULL, NULL) == -1)
 	return (0);
-      memset(fd_ok, 0, MAX_FD);
-      while (chan->root == 0)
-	{
-	  for (j = 0; j < MAX_FD; j++)
-	    {
-	      if (fd_ok[j] == 0 && chan->fd_type[j] != FD_FREE)
-		{
-		  if (FD_ISSET(j, &fd_read))
-		    {
-		      chan->fct_read[j](chan, j);
-		      fd_ok[j] = 1;
-		    }
-		  else if (FD_ISSET(j, &fd_write))
-		    {
-		      client_write(j);
-		      fd_ok[j] = 1;
-		    }
-		}
-	    }
-	  chan = chan->next;
-	}
-      while (chan->root == 0)
-	chan = chan->next;
+      fd_action(chan, &fd_read, &fd_write);
     }
   return (0);
 }
