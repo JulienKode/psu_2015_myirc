@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 16 10:41:14 2016 Julien Karst
-** Last update Fri Jun  3 19:23:19 2016
+** Last update Sat Jun  4 13:09:01 2016 
 */
 
 #include "irc.h"
@@ -23,17 +23,6 @@ t_cmd                   cmds[] =
     {"QUIT", &cmd_quit},
     {"NAMES", &cmd_names}
   };
-
-
-void	cmd_msg(int fd, t_channel *chan, fd_set *fd_write, char *arg_one)
-{
-  chan_message(chan, "Tu est sur le channel\r\n");
-  (void) fd;
-  (void) chan;
-  (void) fd_write;
-  (void) arg_one;
-
-}
 
 void	cmd_send(int fd, t_channel *chan, fd_set *fd_write, char *arg_one)
 {
