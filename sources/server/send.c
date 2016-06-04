@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 30 21:07:04 2016
-** Last update Sat Jun  4 14:22:03 2016
+** Last update Sat Jun  4 15:00:06 2016 
 */
 
 #include	"irc.h"
@@ -38,15 +38,17 @@ int		send_user(t_channel *chan, char *user, char *msg)
 {
   int		i;
   t_channel	*tmp;
+  char		*buf;
 
+
+  asprintf(&buf, ":%s\r\n", msg);
   tmp = found_channel_by_name(chan, "Accueil");
   i = -1;
   while (++i < MAX_FD)
     {
-      printf("[%s][%s]\n", tmp->nick[i], user); // Debug
       if (tmp->nick[i] && strcmp(tmp->nick[i], user) == 0)
 	{
-	  circbuff_write(&(data->circbuff[i]), msg);
+	  circbuff_write(&(data->circbuff[i]), buf);
 	  data->circbuff_read[i] = 1;
 	  return (1);
 	}
