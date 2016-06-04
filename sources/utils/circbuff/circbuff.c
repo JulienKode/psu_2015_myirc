@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Wed May 18 21:29:44 2016  Julien Kast
-** Last update Sat Jun  4 00:29:38 2016 
+** Last update Sat Jun  4 13:26:43 2016 
 */
 
 #include	"utils_circbuff.h"
@@ -28,6 +28,7 @@ t_circbuff	circbuff_create(int size)
 
 int		circbuff_write(t_circbuff *data, char *str)
 {
+  printf("CIRCBUFF W[%d]\n", data->wpos);
   while (*str)
     {
       data->buffer[data->wpos] = *str;
@@ -92,8 +93,5 @@ char		*circbuff_read(t_circbuff *data)
       i++;
     }
   tmp[i + 1] = 0;
-  data->rpos++;
-  if (data->rpos >= data->maxLen)
-    data->rpos = 0;
   return (tmp);
 }
