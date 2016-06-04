@@ -1,15 +1,28 @@
-# README #
+# README OF MyIRC Project #
 
-https://tools.ietf.org/html/rfc1459
+## RFC 1459 ##
+## https://tools.ietf.org/html/rfc1459 ##
+
 This README would normally document whatever steps are necessary to get your application up and running.
 
-### What is this repository for? ###
+## Server ##
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+* ./server [port]
 
-### How do I get set up? ###
+### Command list ###
+* NICK
+* LIST
+* JOIN
+* PART
+* USERS
+* PRIVMSG
+* SEND_FILE
+* ACCEPT_FILE
+* QUIT
+* NAMES
+
+
+## Client ##
 
 * Summary of set up
 * Configuration
@@ -17,14 +30,3 @@ This README would normally document whatever steps are necessary to get your app
 * Database configuration
 * How to run tests
 * Deployment instructions
-
-### Contribution guidelines ###
-
-* Writing tests
-* Code review
-* Other guidelines
-
-### Who do I talk to? ###
-
-* Repo owner or admin
-* Other community or team contact

@@ -5,10 +5,12 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 16 10:41:14 2016 Julien Karst
-** Last update Fri Jun  3 19:23:19 2016
+** Last update Sat Jun  4 13:09:01 2016 
 */
 
 #include "irc.h"
+
+t_data *data = NULL;
 
 t_cmd                   cmds[] =
   {
@@ -23,16 +25,6 @@ t_cmd                   cmds[] =
     {"QUIT", &cmd_quit},
     {"NAMES", &cmd_names}
   };
-
-void	cmd_msg(int fd, t_channel *chan, fd_set *fd_write, char *arg_one)
-{
-  chan_message(chan, "Tu est sur le channel\r\n");
-  (void) fd;
-  (void) chan;
-  (void) fd_write;
-  (void) arg_one;
-
-}
 
 void	cmd_send(int fd, t_channel *chan, fd_set *fd_write, char *arg_one)
 {
@@ -50,12 +42,14 @@ void	cmd_accept(int fd, t_channel *chan, fd_set *fd_write, char *arg_one)
   (void) arg_one;
 }
 
-void			parse_cmd(char *buf, t_channel *chan, int fd, fd_set *fd_write)
+void			parse_cmd(char *buf, t_channel *chan, int fd,
+				  fd_set *fd_write)
 {
   char			*cmd;
   char			*arg_one;
   int			i;
   int			valid;
+  char			*tmp;
 
   buf[strlen(buf) - 1] = 0;
   cmd = strtok(buf, " \t");
@@ -71,8 +65,13 @@ void			parse_cmd(char *buf, t_channel *chan, int fd, fd_set *fd_write)
 	}
       i++;
     }
-  if (valid == 0)
-    dprintf(fd, ":irc.localhost %s %s :Unknown command\r\n", chan->nick[fd], cmd);
+  if (valid == 0 && strlen(buf) > 0)
+    {
+      asprintf(&tmp, ":irc.localhost %s %s :Unknown command\r\n",
+	       chan->nick[fd], cmd);
+      circbuff_write(&(data->circbuff[fd]), tmp);
+      data->circbuff_read[fd] = 1;
+    }
 }
 
 void			client_read(t_channel *chan, int fd, fd_set *fd_read,
@@ -91,21 +90,14 @@ void			client_read(t_channel *chan, int fd, fd_set *fd_read,
   if ((size = getline(&buf, &n, fp)) > 1)
     {
       buf[size - 1] = 0;
-      printf("Envoyé depuis le client : %s\r\n", buf); // A retirer
       parse_cmd(buf, chan, fd, fd_write);
     }
   else
     {
-      msg = malloc(strlen(chan->nick[fd]) + 28);
-      if (msg != NULL)
-	{
-	  msg = strcpy(msg, chan->nick[fd]);
-	  msg = strcat(msg, " QUIT :Disconnected by User");
-	  global_message(chan, msg);
-	}
-      chan->fd_type[fd] = FD_FREE;
+      asprintf(&msg, "%s QUIT :Disconnected by User", chan->nick[fd]);
+      global_message(chan, msg);
+      client_exit(chan, fd);
       fclose(fp);
-      close(fd);
     }
 }
 
@@ -119,17 +111,18 @@ void			add_client(t_channel *chan, int s)
   cs = accept(s, (struct sockaddr *)&client_sin, &client_sin_len);
   chan->fd_type[cs] = FD_CLIENT;
   chan->fct_read[cs] = client_read;
-  chan->fct_write[cs] = NULL;
   chan->nick[cs] = strdup("Anonymous");
-  dprintf(cs, ":irc.localhost 001 Anonymous :Welcome to the Internet Relay"
-	  " Network Anonymous!~nobody@127.0.0.1\r\n"
-	  ":irc.localhost 002 Anonymous :Your host is irc.localhost, "
-	  "running version 1.0\r\n"
-	  ":irc.localhost 003 Anonymous :This server was created Sun May "
-	  "29 at 14:00:00\r\n"
-	  ":irc.localhost 004 Anonymous :irc.localhost 1.0 aoOirw "
-	  "abeiIklmnoOpqrsRstv\r\n");
-  global_message(chan, strdup(":An Anonymous USER joined the server !"));
+  circbuff_write(&(data->circbuff[cs]), ":irc.localhost 001 Anonymous "
+		 ":Welcome to the Internet Relay"
+		 " Network Anonymous!~nobody@127.0.0.1\r\n"
+		 ":irc.localhost 002 Anonymous :Your host is irc.localhost, "
+		 "running version 1.0\r\n"
+		 ":irc.localhost 003 Anonymous :This server was created Sun "
+		 "May 29 at 14:00:00\r\n"
+		 ":irc.localhost 004 Anonymous :irc.localhost 1.0 aoOirw "
+		 "abeiIklmnoOpqrsRstv\r\n");
+  data->circbuff_read[cs] = 1;
+  global_message(chan, "An Anonymous USER joined the server !");
 }
 
 void			server_read(t_channel *chan, int fd, fd_set *fd_read,
@@ -156,7 +149,7 @@ void			add_server(t_channel *chan)
   listen(s, 42);
   chan->next->fd_type[s] = FD_SERVER;
   chan->next->fct_read[s] = server_read;
-  chan->next->fct_write[s] = NULL;
+  data->circbuff_read[s] = 0;
 }
 
 int			main(int ac, char **argv)
@@ -164,9 +157,16 @@ int			main(int ac, char **argv)
   t_channel		*chan;
   int			i;
   int			j;
-  fd_set fd_read;
-  fd_set fd_write;
+  fd_set		fd_read;
+  fd_set		fd_write;
+  int			fd_ok[MAX_FD];
+  t_data		main_data;
 
+  i = -1;
+  while (++i < MAX_FD)
+    main_data.circbuff[i] = circbuff_create(1024);
+  memset(main_data.circbuff_read, 0, MAX_FD);
+  data = &main_data;
   if (ac != 2)
     {
       printf("Usage : ./server [port]\n");
@@ -183,38 +183,41 @@ int			main(int ac, char **argv)
       FD_SET(3, &fd_read);
       while (chan->root == 0)
 	{
-	  /* FD_ZERO(&(chan->fd_read)); */
 	  for (i = 0; i < MAX_FD; i++)
 	    if (chan->fd_type[i] == FD_CLIENT)
-	      /*     FD_SET(i, &(chan->fd_read)); */
-	      /* FD_ZERO(&(chan->fd_write)); */
-	      FD_SET(i, &fd_read);
+	      {
+		FD_SET(i, &fd_read);
+		if (data->circbuff_read[i])
+		  FD_SET(i, &fd_write);
+	      }
 	  chan = chan->next;
 	}
-      //for (i = 0; i < MAX_FD; i++)
-      //if (chan->fd_type[i] != FD_FREE) et quelque chose dans le buffer circulaire
-      //FD_SET(i, &(chan->fd_write));
-      if (select(MAX_FD + 1, &fd_read, NULL, NULL, NULL) == -1)
-	return (0);
       chan = chan->next;
-      int ok = 0;
-      while (chan->root == 0 && ok == 0)
+      if (select(MAX_FD + 1, &fd_read, &fd_write, NULL, NULL) == -1)
+	return (0);
+      memset(fd_ok, 0, MAX_FD);
+      while (chan->root == 0)
 	{
 	  for (j = 0; j < MAX_FD; j++)
-	    if (FD_ISSET(j, &fd_read) && chan->fd_type[j] != FD_FREE)
-	      {
-		chan->fct_read[j](chan, j, fd_read, fd_write);
-		ok = 1;
-	      }
+	    {
+	      if (fd_ok[j] == 0 && chan->fd_type[j] != FD_FREE)
+		{
+		  if (FD_ISSET(j, &fd_read))
+		    {
+		      chan->fct_read[j](chan, j, fd_read, fd_write);
+		      fd_ok[j] = 1;
+		    }
+		  else if (FD_ISSET(j, &fd_write))
+		    {
+		      client_write(j);
+		      fd_ok[j] = 1;
+		    }
+		}
+	    }
 	  chan = chan->next;
 	}
       while (chan->root == 0)
 	chan = chan->next;
-      /* for (j = 0; j < MAX_FD; j++) */
-      /*   if (FD_ISSET(j, &(chan->fd_write))) */
-      /*     dprintf(j, "%s", chan->circbuff[j]); */
-      /* chan = chan->next; */
-      /* } */
     }
   return (0);
 }
