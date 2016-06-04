@@ -10,6 +10,26 @@
 
 #include	"irc.h"
 
+void		cmd_list_loop(t_channel *chan, t_channel *tmp, int fd, char *a)
+{
+  char		*buf;
+
+  if (a && tmp->name && tmp->name[0] == '#' && strstr(tmp->name, a))
+    {
+      asprintf(&buf, ":irc.localhost 322 %s %s %d :\r\n",
+	       chan->nick[fd], tmp->name, nb_of_users(tmp));
+      circbuff_write(&(data->circbuff[fd]), buf);
+      data->circbuff_read[fd] = 1;
+    }
+  else if (tmp->name && tmp->name[0] == '#' && a == NULL)
+    {
+      asprintf(&buf, ":irc.localhost 322 %s %s %d :\r\n", chan->nick[fd],
+	       tmp->name, nb_of_users(tmp));
+      circbuff_write(&(data->circbuff[fd]), buf);
+      data->circbuff_read[fd] = 1;
+    }
+}
+
 void		cmd_list(int fd, t_channel *chan, char *arg_one)
 {
   t_channel	*tmp;
@@ -25,22 +45,7 @@ void		cmd_list(int fd, t_channel *chan, char *arg_one)
   data->circbuff_read[fd] = 1;
   while (tmp->root == 0)
     {
-      if (arg_one && tmp->name
-	  && tmp->name[0] == '#' && strstr(tmp->name, arg_one) != NULL)
-	{
-	  asprintf(&buf, ":irc.localhost 322 %s %s %d :\r\n",
-		   chan->nick[fd], tmp->name, nb_of_users(tmp));
-	  circbuff_write(&(data->circbuff[fd]), buf);
-	  data->circbuff_read[fd] = 1;
-	}
-      else if (tmp->name && tmp->name[0] == '#'
-	       && arg_one == NULL)
-	{
-	  asprintf(&buf, ":irc.localhost 322 %s %s %d :\r\n", chan->nick[fd],
-		   tmp->name, nb_of_users(tmp));
-	  circbuff_write(&(data->circbuff[fd]), buf);
-	  data->circbuff_read[fd] = 1;
-	}
+      cmd_list_loop(chan, tmp, fd, arg_one);
       tmp = tmp->next;
     }
   asprintf(&buf, ":irc.localhost 323 %s :End of /LIST\r\n", chan->nick[fd]);
