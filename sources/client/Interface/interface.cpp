@@ -5,9 +5,12 @@
 #include "interface.h"
 #include "connection.h"
 #include "smileylist.h"
+#include "../../../includes/irc.h"
 
-Interface::Interface(t_client *client, QWidget *parent) :
+Interface::Interface(t_client *client, fd_set *fd_read, fd_set *fd_write, QWidget *parent) :
     QDialog(parent),
+    fd_read(fd_read),
+    fd_write(fd_write),
     client(client),
     ui(new Ui::Interface)
 {
@@ -28,11 +31,22 @@ Interface::Interface(t_client *client, QWidget *parent) :
              smileys["[" + name.substr(0, name.length() - 4) + "]"] = "<img src='../ico/emote/" + name +"'>";
      }
      closedir(pdir);
+     QTimer *timer = new QTimer();
+     timer->connect(timer, SIGNAL(timeout()), this, SLOT(refresh()));
+     timer->start(100);
      ui->setupUi(this);
      ui->chat->setTabsClosable(true);
      ui->chat->removeTab(0);
      ui->chat->removeTab(0);
      ui->smileys->setIcon(QIcon("../ico/emote/happy.png"));
+}
+
+void Interface::refresh()
+{
+    init_fd_set_client(client, fd_read, fd_write);
+    if (select(MAX_FD + 1, fd_read, fd_write, NULL, NULL) == -1)
+        exit(42);
+    fd_action_client(client, fd_read, fd_write);
 }
 
 Interface::~Interface()

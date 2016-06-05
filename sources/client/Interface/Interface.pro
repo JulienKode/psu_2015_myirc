@@ -15,11 +15,9 @@ TEMPLATE = app
 SOURCES += main.cpp\
         interface.cpp \
     connection.cpp \
-    ../client.c \
     ../cmd.c \
     ../list.c \
     ../send_buff.c \
-    ../../utils/circbuff/circbuff.c \
     ../cmd_2.c \
     smileylist.cpp
 

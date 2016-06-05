@@ -114,6 +114,8 @@ void			client_send(t_client*, char*, char*);
 void			client_accept(t_client*, char*, char*);
 void			client_server(t_client *, char*, char *);
 void			create_client(t_client*, int);
+void			fd_action_client(t_client *client, fd_set *fd_read, fd_set *fd_write);
+void			init_fd_set_client(t_client *client, fd_set *fd_read, fd_set *fd_write);
 t_client		*init_list_client();
 t_client		*found_client_by_fd(t_client*, int);
 t_channel		*found_channel_by_name(t_channel *, char *);
