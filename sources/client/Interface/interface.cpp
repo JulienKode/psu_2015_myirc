@@ -84,14 +84,33 @@ Interface::~Interface()
     delete ui;
 }
 
+int list_counts(t_client *client)
+{
+   t_client *tmp;
+   int i;
+
+   i = 0;
+   tmp = client;
+   while (tmp->root == 0)
+    tmp = tmp->next;
+   tmp = tmp->next->next;
+   while (tmp->root == 0)
+   {
+       if (tmp->fd_type != FD_FREE)
+           i++;
+    tmp = tmp->next;
+   }
+return (i);
+}
+
 void Interface::on_connect_clicked()
 {
     Connection w(client, this, ui);
 
-    int i = list_count(client);
+    int i = list_counts(client);
     w.show();
     w.exec();
-    if (i != list_count(client))
+    if (i != list_counts(client))
         _select = true;
 }
 
