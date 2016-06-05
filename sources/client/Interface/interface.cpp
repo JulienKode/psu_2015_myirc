@@ -87,9 +87,12 @@ Interface::~Interface()
 void Interface::on_connect_clicked()
 {
     Connection w(client, this, ui);
+
+    int i = list_count(client);
     w.show();
     w.exec();
-    _select = true;
+    if (i != list_count(client))
+        _select = true;
 }
 
 void Interface::on_smileys_clicked()
