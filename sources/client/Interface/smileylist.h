@@ -16,12 +16,11 @@ class SmileyList : public QDialog
     Q_OBJECT
 
 public:
-    explicit SmileyList(QWidget *parent, QLineEdit *edit, std::map<std::string, std::string> smileys);
+    explicit SmileyList(QWidget *parent, QLineEdit *edit, std::map<std::string, std::string> smileys, std::map<std::string, std::string> smileyepitech);
     ~SmileyList();
 
 private slots:
-    void on_list_itemClicked(QListWidgetItem *item);
-
+    void itemClickedSmiley(QListWidgetItem* item);
 private:
     Ui::SmileyList *ui;
     QLineEdit *line;

@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Wed May 18 21:29:44 2016  Julien Kast
-// Last update Sun Jun  5 21:48:07 2016 
+// Last update Sun Jun  5 21:48:07 2016
 */
 
 #include	"../../includes/utils_circbuff.h"

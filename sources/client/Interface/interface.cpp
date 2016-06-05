@@ -32,6 +32,19 @@ Interface::Interface(t_client *client, fd_set *fd_read, fd_set *fd_write, QWidge
              smileys["[" + name.substr(0, name.length() - 4) + "]"] = "<img src='../ico/emote/" + name +"'>";
      }
      closedir(pdir);
+     pdir=opendir("../ico/emote/epitech");
+     if (!pdir){
+     printf ("Smileys loading failure ...");
+     exit(1);
+     }
+
+     while ((pent = readdir(pdir)))
+     {
+        name = pent->d_name;
+        if (name.length() > 4 && name[name.length() - 4] == '.')
+             smileyepitech["[" + name.substr(0, name.length() - 4) + "]"] = "<img src='../ico/emote/epitech/" + name +"'>";
+     }
+     closedir(pdir);
      ui_setup = false;
      ui->setupUi(this);
      ui_setup = true;
@@ -66,6 +79,7 @@ void Interface::refresh()
               if (tmp->fd_type != FD_FREE && tmp->circbuff_r == 1)
               {
                   buf = get_buff_read_underground(tmp);
+                  // Avant d'AddText, faire du parsing pour savoir si c'est le retour d'une commande, un message privé ou autre
                   if (buf)
                     addText(tmp->name, buf);
               }
@@ -112,7 +126,7 @@ void Interface::on_connect_clicked()
 
 void Interface::on_smileys_clicked()
 {
-    SmileyList w(this, ui->message, smileys);
+    SmileyList w(this, ui->message, smileys, smileyepitech);
     w.show();
     w.exec();
 }
@@ -142,16 +156,24 @@ std::string Interface::format_message(char *m)
            index += it->second.length();
       }
     }
+  for (std::map<std::string, std::string>::iterator it = smileyepitech.begin(); it != smileyepitech.end(); ++it)
+    {
+      size_t index = 0;
+      while (42)
+      {
+           index = msg.find(it->first, index);
+           if (index == std::string::npos)
+               break;
+           msg.replace(index, it->first.length(), it->second);
+           index += it->second.length();
+      }
+    }
   return (msg);
 }
 
-void Interface::on_send_clicked()
+void Interface::on_message_returnPressed()
 {
-    if (!ui->message->text().isEmpty())
-    {
-        // Si c'est une commande, executer la commande sur le serveur actif
-        // Sinon PRIVMSG ui->chat->tabText(ui->chat->currentIndex()) ui->message->text sur le serveur actif
-    }
+    on_send_clicked();
 }
 
 QTreeWidgetItem *addTreeRoot(QTreeWidget *tree, QString name, QString description)
@@ -191,12 +213,6 @@ void Interface::on_channels_itemDoubleClicked(QTreeWidgetItem *item, int column)
 {
     QTextEdit *textEdit = new QTextEdit;
     textEdit->setReadOnly(true);
-
-    // TESTS
-  //addText("bite", "Je teste un smiley [faux] [bored] mdr je suis fatigué [beer][beer][beer]!");
- // addText("bite", "Lol je veux mon pseudo en couleur bitch ! malot_k Ah ouais ça marche :O malot_k malot_k ");
-   //
-
     if (item->parent())
     {
         if (item->text(column).toStdString()[0] == '#' || item->text(column).toStdString()[0] == '&')
@@ -234,5 +250,17 @@ void Interface::on_chat_tabCloseRequested(int index)
     ui->chat->removeTab(index);
 }
 
+void Interface::on_send_clicked()
+{
+    if (!ui->message->text().isEmpty())
+    {
+        // Si c'est une commande, executer la commande sur le serveur actif
+        // Sinon PRIVMSG ui->chat->tabText(ui->chat->currentIndex()) ui->message->text sur le serveur actif
+    }
+    ui->message->setText("");
+}
+
 // Refresh en masse la liste ui->channels et le chat
+// Si on reçoit un PRIVMSG, ouvrir une tab (si elle n'est pas deja ouverte), sinon écrite dans la tab ouverte et surligner nom en rouge
 // A chaque envoi depuis le client, décaler la structure client avant d'appeler la fonction (ex : nick)
+

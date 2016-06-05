@@ -42,11 +42,12 @@ public:
         Connection->resize(317, 175);
         label = new QLabel(Connection);
         label->setObjectName(QStringLiteral("label"));
-        label->setGeometry(QRect(10, 0, 181, 41));
+        label->setGeometry(QRect(10, 10, 181, 41));
         QFont font;
+        font.setFamily(QStringLiteral("Saab"));
         font.setPointSize(16);
-        font.setBold(true);
-        font.setWeight(75);
+        font.setBold(false);
+        font.setWeight(50);
         label->setFont(font);
         connect = new QPushButton(Connection);
         connect->setObjectName(QStringLiteral("connect"));
@@ -56,15 +57,15 @@ public:
         return_2->setGeometry(QRect(40, 140, 111, 31));
         label_2 = new QLabel(Connection);
         label_2->setObjectName(QStringLiteral("label_2"));
-        label_2->setGeometry(QRect(10, 30, 181, 41));
+        label_2->setGeometry(QRect(10, 40, 181, 41));
         label_2->setFont(font);
         label_3 = new QLabel(Connection);
         label_3->setObjectName(QStringLiteral("label_3"));
-        label_3->setGeometry(QRect(10, 60, 181, 41));
+        label_3->setGeometry(QRect(10, 70, 181, 41));
         label_3->setFont(font);
         label_4 = new QLabel(Connection);
         label_4->setObjectName(QStringLiteral("label_4"));
-        label_4->setGeometry(QRect(10, 90, 181, 41));
+        label_4->setGeometry(QRect(10, 100, 181, 41));
         label_4->setFont(font);
         name = new QLineEdit(Connection);
         name->setObjectName(QStringLiteral("name"));
@@ -96,8 +97,8 @@ public:
         return_2->setToolTip(QApplication::translate("Connection", "<html><head/><body><p>Envoyer la t\303\242che au programme</p></body></html>", 0));
 #endif // QT_NO_TOOLTIP
         return_2->setText(QApplication::translate("Connection", "Return", 0));
-        label_2->setText(QApplication::translate("Connection", "Server  Address", 0));
-        label_3->setText(QApplication::translate("Connection", "Server Port", 0));
+        label_2->setText(QApplication::translate("Connection", "Address", 0));
+        label_3->setText(QApplication::translate("Connection", "Port", 0));
         label_4->setText(QApplication::translate("Connection", "Nickname", 0));
         name->setText(QString());
     } // retranslateUi

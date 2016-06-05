@@ -34,12 +34,15 @@ private slots:
 
     void refresh();
 
+    void on_message_returnPressed();
+
 private:
     bool                    _select;
     bool ui_setup;
     fd_set                *fd_read;
     fd_set                *fd_write;
     std::map<std::string, std::string> smileys;
+    std::map<std::string, std::string> smileyepitech;
     t_client *client;
     Ui::Interface *ui;
 };
