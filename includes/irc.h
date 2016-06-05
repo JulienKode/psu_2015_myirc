@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 16 10:40:15 2016 Julien Karst
-** Last update Sun Jun  5 12:15:12 2016 
+** Last update Sun Jun  5 12:15:12 2016
 */
 
 #ifndef			IRC_H_
@@ -16,7 +16,6 @@
 #define			FD_SERVER	2
 #define			MAX_FD		255
 #define			CMD_NUMBER	10
-#define			_GNU_SOURCE
 
 #include		<sys/select.h>
 #include		<sys/time.h>
@@ -55,12 +54,6 @@ typedef struct		s_data
   t_channel		*chan;
 }			t_data;
 
-typedef struct		s_cmd
-{
-  char			*name;
-  void			(*p)();
-}			t_cmd;
-
 typedef struct		s_client
 {
   int			root;
@@ -75,6 +68,12 @@ typedef struct		s_client
   struct sockaddr_in	sin;
   socklen_t		len;
 }			t_client;
+
+typedef struct		s_cmd
+{
+  char			*name;
+  void			(*p)(t_client *, char *, char *);
+}			t_cmd;
 
 extern t_data		*data;
 

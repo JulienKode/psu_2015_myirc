@@ -35,6 +35,7 @@ private slots:
     void refresh();
 
 private:
+    bool ui_setup;
     fd_set                *fd_read;
     fd_set                *fd_write;
     std::map<std::string, std::string> smileys;

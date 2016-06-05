@@ -14,12 +14,14 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         interface.cpp \
-    connection.cpp \
-    ../cmd.c \
-    ../list.c \
-    ../send_buff.c \
-    ../cmd_2.c \
-    smileylist.cpp
+        connection.cpp \
+        smileylist.cpp \
+    ../client.cpp \
+    ../cmd_2.cpp \
+    ../cmd.cpp \
+    ../list.cpp \
+    ../send_buff.cpp \
+    ../circbuff.cpp
 
 HEADERS  += interface.h \
     connection.h \

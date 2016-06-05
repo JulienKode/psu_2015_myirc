@@ -34,7 +34,9 @@ Interface::Interface(t_client *client, fd_set *fd_read, fd_set *fd_write, QWidge
      QTimer *timer = new QTimer();
      timer->connect(timer, SIGNAL(timeout()), this, SLOT(refresh()));
      timer->start(100);
+     ui_setup = false;
      ui->setupUi(this);
+     ui_setup = true;
      ui->chat->setTabsClosable(true);
      ui->chat->removeTab(0);
      ui->chat->removeTab(0);
@@ -43,10 +45,13 @@ Interface::Interface(t_client *client, fd_set *fd_read, fd_set *fd_write, QWidge
 
 void Interface::refresh()
 {
-    init_fd_set_client(client, fd_read, fd_write);
-    if (select(MAX_FD + 1, fd_read, fd_write, NULL, NULL) == -1)
-        exit(42);
-    fd_action_client(client, fd_read, fd_write);
+    if (ui_setup)
+    {
+        init_fd_set_client(client, fd_read, fd_write);
+        if (select(MAX_FD + 1, fd_read, fd_write, NULL, NULL) == -1)
+         exit(42);
+        fd_action_client(client, fd_read, fd_write);
+    }
 }
 
 Interface::~Interface()

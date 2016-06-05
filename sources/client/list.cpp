@@ -13,10 +13,8 @@
 
 t_client	*init_list_client()
 {
-  t_client	*root;
+  t_client	*root = new t_client;
 
-  if ((root = malloc(sizeof(t_client))) == NULL)
-    exit(42);
   root->root = 1;
   root->prev = root;
   root->next = root;
@@ -27,10 +25,8 @@ t_client	*init_list_client()
 
 void		create_client(t_client *root, int fd)
 {
-  t_client	*elem;
+  t_client	*elem = new t_client;
 
-  if ((elem = malloc(sizeof(t_client))) == NULL)
-    exit(42);
   elem->root = 0;
   elem->next = root;
   elem->prev = root->prev;

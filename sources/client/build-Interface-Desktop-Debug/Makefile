@@ -51,25 +51,25 @@ OBJECTS_DIR   = ./
 SOURCES       = ../Interface/main.cpp \
 		../Interface/interface.cpp \
 		../Interface/connection.cpp \
-		../client.c \
-		../cmd.c \
-		../list.c \
-		../send_buff.c \
-		../../utils/circbuff/circbuff.c \
-		../cmd_2.c \
-		../Interface/smileylist.cpp moc_interface.cpp \
+		../Interface/smileylist.cpp \
+		../client.cpp \
+		../cmd_2.cpp \
+		../cmd.cpp \
+		../list.cpp \
+		../send_buff.cpp \
+		../circbuff.cpp moc_interface.cpp \
 		moc_connection.cpp \
 		moc_smileylist.cpp
 OBJECTS       = main.o \
 		interface.o \
 		connection.o \
+		smileylist.o \
 		client.o \
+		cmd_2.o \
 		cmd.o \
 		list.o \
 		send_buff.o \
 		circbuff.o \
-		cmd_2.o \
-		smileylist.o \
 		moc_interface.o \
 		moc_connection.o \
 		moc_smileylist.o
@@ -135,13 +135,13 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		../Interface/smileylist.h ../Interface/main.cpp \
 		../Interface/interface.cpp \
 		../Interface/connection.cpp \
-		../client.c \
-		../cmd.c \
-		../list.c \
-		../send_buff.c \
-		../../utils/circbuff/circbuff.c \
-		../cmd_2.c \
-		../Interface/smileylist.cpp
+		../Interface/smileylist.cpp \
+		../client.cpp \
+		../cmd_2.cpp \
+		../cmd.cpp \
+		../list.cpp \
+		../send_buff.cpp \
+		../circbuff.cpp
 QMAKE_TARGET  = Interface
 DESTDIR       = #avoid trailing-slash linebreak
 TARGET        = Interface
@@ -308,7 +308,7 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents ../Interface/interface.h ../Interface/connection.h ../../../includes/irc.h ../Interface/smileylist.h $(DISTDIR)/
-	$(COPY_FILE) --parents ../Interface/main.cpp ../Interface/interface.cpp ../Interface/connection.cpp ../client.c ../cmd.c ../list.c ../send_buff.c ../../utils/circbuff/circbuff.c ../cmd_2.c ../Interface/smileylist.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ../Interface/main.cpp ../Interface/interface.cpp ../Interface/connection.cpp ../Interface/smileylist.cpp ../client.cpp ../cmd_2.cpp ../cmd.cpp ../list.cpp ../send_buff.cpp ../circbuff.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents ../Interface/interface.ui ../Interface/connection.ui ../Interface/smileylist.ui $(DISTDIR)/
 
 
@@ -389,7 +389,8 @@ interface.o: ../Interface/interface.cpp ../Interface/interface.h \
 		../../../includes/utils_circbuff.h \
 		ui_interface.h \
 		../Interface/connection.h \
-		ui_connection.h
+		ui_connection.h \
+		../Interface/smileylist.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o interface.o ../Interface/interface.cpp
 
 connection.o: ../Interface/connection.cpp ../Interface/connection.h \
@@ -400,32 +401,32 @@ connection.o: ../Interface/connection.cpp ../Interface/connection.h \
 		ui_connection.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o connection.o ../Interface/connection.cpp
 
-client.o: ../client.c ../../../includes/irc.h \
-		../../../includes/utils_circbuff.h
-	$(CC) -c $(CFLAGS) $(INCPATH) -o client.o ../client.c
-
-cmd.o: ../cmd.c ../../../includes/irc.h \
-		../../../includes/utils_circbuff.h
-	$(CC) -c $(CFLAGS) $(INCPATH) -o cmd.o ../cmd.c
-
-list.o: ../list.c ../../../includes/irc.h \
-		../../../includes/utils_circbuff.h
-	$(CC) -c $(CFLAGS) $(INCPATH) -o list.o ../list.c
-
-send_buff.o: ../send_buff.c ../../../includes/irc.h \
-		../../../includes/utils_circbuff.h
-	$(CC) -c $(CFLAGS) $(INCPATH) -o send_buff.o ../send_buff.c
-
-circbuff.o: ../../utils/circbuff/circbuff.c ../../../includes/utils_circbuff.h
-	$(CC) -c $(CFLAGS) $(INCPATH) -o circbuff.o ../../utils/circbuff/circbuff.c
-
-cmd_2.o: ../cmd_2.c ../../../includes/irc.h \
-		../../../includes/utils_circbuff.h
-	$(CC) -c $(CFLAGS) $(INCPATH) -o cmd_2.o ../cmd_2.c
-
 smileylist.o: ../Interface/smileylist.cpp ../Interface/smileylist.h \
 		ui_smileylist.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o smileylist.o ../Interface/smileylist.cpp
+
+client.o: ../client.cpp ../../../includes/irc.h \
+		../../../includes/utils_circbuff.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o client.o ../client.cpp
+
+cmd_2.o: ../cmd_2.cpp ../../../includes/irc.h \
+		../../../includes/utils_circbuff.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o cmd_2.o ../cmd_2.cpp
+
+cmd.o: ../cmd.cpp ../../../includes/irc.h \
+		../../../includes/utils_circbuff.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o cmd.o ../cmd.cpp
+
+list.o: ../list.cpp ../../../includes/irc.h \
+		../../../includes/utils_circbuff.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o list.o ../list.cpp
+
+send_buff.o: ../send_buff.cpp ../../../includes/irc.h \
+		../../../includes/utils_circbuff.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o send_buff.o ../send_buff.cpp
+
+circbuff.o: ../circbuff.cpp ../../../includes/utils_circbuff.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o circbuff.o ../circbuff.cpp
 
 moc_interface.o: moc_interface.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_interface.o moc_interface.cpp
