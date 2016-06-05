@@ -223,3 +223,4 @@ void Interface::on_chat_tabCloseRequested(int index)
 }
 
 // Refresh en masse la liste ui->channels et le chat
+// A chaque envoi depuis le client, décaler la structure client avant d'appeler la fonction (ex : nick)
