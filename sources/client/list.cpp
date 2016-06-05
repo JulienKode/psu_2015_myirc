@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Sat Jun  4 20:51:19 2016
-// Last update Sun Jun  5 16:46:07 2016 
+// Last update Sun Jun  5 17:28:39 2016 
 */
 
 #include	<stdlib.h>
@@ -58,6 +58,23 @@ t_client	*found_client_by_fd(t_client *client, int fd)
   while (tmp->root == 0)
     {
       if (tmp->root == 0 && tmp->fd == fd)
+	return (tmp);
+      tmp = tmp->next;
+    }
+  return (NULL);
+}
+
+t_client	*found_client_by_name(t_client *client, char *str)
+{
+  t_client	*tmp;
+
+  tmp = client;
+  while (tmp->root == 0)
+    tmp = tmp->next;
+  tmp = tmp->next;
+  while (tmp->root == 0)
+    {
+      if (tmp->name && strcmp(tmp->name, str) == 0)
 	return (tmp);
       tmp = tmp->next;
     }
