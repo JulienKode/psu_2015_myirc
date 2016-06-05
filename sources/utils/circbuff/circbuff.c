@@ -5,10 +5,14 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Wed May 18 21:29:44 2016  Julien Kast
-** Last update Wed May 25 21:23:11 2016 
+** Last update Jan Jun 5 15:58:28 2016 Julien Karst
 */
 
 #include	"utils_circbuff.h"
+
+#ifdef __cplusplus
+    extern "C" {
+#endif
 
 t_circbuff	circbuff_create(int size)
 {
@@ -95,3 +99,7 @@ char		*circbuff_read(t_circbuff *data)
     data->rpos = 0;
   return (tmp);
 }
+
+#ifdef __cplusplus
+    }
+#endif
