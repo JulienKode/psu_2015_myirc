@@ -5,10 +5,12 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Sat Jun  4 16:34:17 2016
-// Last update Sun Jun  5 21:06:21 2016 
+// Last update Sun Jun  5 21:13:49 2016 
 */
 
 #include	"../../includes/irc.h"
+
+std::mutex mtx;
 
 void		send_buff_client_write(t_client *client, char *str)
 {

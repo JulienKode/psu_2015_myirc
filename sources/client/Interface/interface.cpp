@@ -65,12 +65,9 @@ void Interface::refresh()
         {
               if (tmp->fd_type != FD_FREE && tmp->circbuff_r == 1)
               {
-                buf = circbuff_read(&(tmp->circbuff_read));
-                if (buf)
-                  {
+                  buf = get_buff_read_underground(tmp);
+                  if (buf)
                     addText(tmp->name, buf);
-                    tmp->circbuff_r = 0;
-                  }
               }
            tmp = tmp->next;
         }
