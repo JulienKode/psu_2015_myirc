@@ -5,14 +5,10 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Wed May 18 21:29:44 2016  Julien Kast
-** Last update Jan Jun 5 15:58:28 2016 Julien Karst
+** Last update Jan Jun 5 22:09:11 2016 Julien Karst
 */
 
 #include	"utils_circbuff.h"
-
-#ifdef __cplusplus
-    extern "C" {
-#endif
 
 t_circbuff	circbuff_create(int size)
 {
@@ -21,7 +17,7 @@ t_circbuff	circbuff_create(int size)
   res.maxLen = size;
   res.rpos = 0;
   res.wpos = 0;
-  if ((res.buffer = malloc(size * sizeof(char))) == NULL)
+  if ((res.buffer = malloc((size + 1) * sizeof(char))) == NULL)
     {
       res.maxLen = 0;
       perror("malloc");
@@ -40,9 +36,6 @@ int		circbuff_write(t_circbuff *data, char *str)
 	data->wpos = 0;
     }
   data->buffer[data->wpos] = 0;
-  data->wpos++;
-  if (data->wpos >= data->maxLen)
-    data->wpos = 0;
   return (1);
 }
 
@@ -79,7 +72,8 @@ char		*circbuff_read(t_circbuff *data)
 
   i = 0;
   len = circbuff_len(data);
-  tmp = malloc(len * sizeof(char));
+  tmp = malloc((len) * sizeof(char));
+  memset(tmp, 0, len);
   tmp[i] = 0;
   while (i < (len - 2) && data->rpos < (data->maxLen + 1))
     {
@@ -94,12 +88,5 @@ char		*circbuff_read(t_circbuff *data)
       i++;
     }
   tmp[i + 1] = 0;
-  data->rpos++;
-  if (data->rpos >= data->maxLen)
-    data->rpos = 0;
   return (tmp);
 }
-
-#ifdef __cplusplus
-    }
-#endif
