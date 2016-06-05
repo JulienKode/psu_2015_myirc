@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 16 10:40:15 2016 Julien Karst
-** Last update Sun Jun  5 12:15:12 2016
+** Last update Sun Jun  5 16:45:37 2016 
 */
 
 #ifndef			IRC_H_
@@ -67,6 +67,8 @@ typedef struct		s_client
   int			fd;
   struct sockaddr_in	sin;
   socklen_t		len;
+  char			*name;
+  char			*ip;
 }			t_client;
 
 typedef struct		s_cmd
