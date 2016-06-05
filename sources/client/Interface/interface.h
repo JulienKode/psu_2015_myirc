@@ -35,6 +35,7 @@ private slots:
     void refresh();
 
 private:
+    bool                    _select;
     bool ui_setup;
     fd_set                *fd_read;
     fd_set                *fd_write;

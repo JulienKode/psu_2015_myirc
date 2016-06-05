@@ -17,6 +17,7 @@ Interface::Interface(t_client *client, fd_set *fd_read, fd_set *fd_write, QWidge
      DIR *pdir;
      struct dirent *pent;
 
+     _select = false;
      pdir=opendir("../ico/emote");
      if (!pdir){
      printf ("Smileys loading failure ...");
@@ -54,8 +55,11 @@ void Interface::refresh()
     if (ui_setup)
     {
         init_fd_set_client(client, fd_read, fd_write);
-        if (select(MAX_FD + 1, fd_read, fd_write, NULL, &t) == -1)
-         exit(42);
+        if (_select)
+        {
+            if (select(MAX_FD + 1, fd_read, fd_write, NULL, &t) == -1)
+             exit(42);
+        }
         tmp = client->next->next;
         while (tmp->root == 0)
         {
@@ -85,6 +89,7 @@ void Interface::on_connect_clicked()
     Connection w(client, this, ui);
     w.show();
     w.exec();
+    _select = true;
 }
 
 void Interface::on_smileys_clicked()
