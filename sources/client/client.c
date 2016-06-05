@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 16 10:41:14 2016 Julien Karst
-** Last update Sun Jun  5 13:57:42 2016 
+** Last update Sun Jun  5 13:57:42 2016
 */
 
 #include "../../includes/irc.h"
@@ -212,7 +212,7 @@ void			fd_action_client
     }
 }
 
-int			main_loop()
+int			main()
 {
   t_client		*client;
   fd_set		fd_read;
