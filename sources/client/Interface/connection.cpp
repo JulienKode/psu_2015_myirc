@@ -15,9 +15,29 @@ Connection::~Connection()
     delete ui;
 }
 
+int list_count(t_client *client)
+{
+   t_client *tmp;
+   int i;
+
+   i = 0;
+   tmp = client;
+   while (tmp->root == 0)
+    tmp = tmp->next;
+   tmp = tmp->next->next;
+   while (tmp->root == 0)
+   {
+       if (tmp->fd_type != FD_FREE)
+           i++;
+    tmp = tmp->next;
+   }
+return (i);
+}
+
 void Connection::on_connect_clicked()
 {
     t_client *tmp;
+    int nb_serv = list_count(client);
     QTextEdit *textEdit = new QTextEdit;
     textEdit->setReadOnly(true);
 
@@ -26,6 +46,8 @@ void Connection::on_connect_clicked()
     else
     {
         client_server(client, (char*) ui->address->text().toStdString().c_str(), (char *)ui->port->text().toStdString().c_str());
+        if (list_count(client) == nb_serv)
+            return;
         tmp = client;
         while (tmp->root == 0)
           tmp = tmp->next;
@@ -40,7 +62,9 @@ void Connection::on_connect_clicked()
               }
             tmp = tmp->next;
          }
-        client_nick(client,  (char *)ui->nick->text().toStdString().c_str(), NULL);
+        if (tmp->root == 1)
+            return;
+//        client_nick(client, (char *)ui->nick->text().toStdString().c_str(), NULL);
         parent_ui->chat->addTab(textEdit, QIcon("../ico/server.png"), ui->name->text());
         QTreeWidgetItem *server = addTreeRoot(parent_ui->channels, ui->name->text(), ui->address->text());
         // LIST + addTreeChild de tous les channels
