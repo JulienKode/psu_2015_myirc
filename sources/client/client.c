@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 16 10:41:14 2016 Julien Karst
-** Last update Sun Jun  5 01:42:19 2016 
+** Last update Sun Jun  5 13:57:42 2016 
 */
 
 #include "../../includes/irc.h"
@@ -42,10 +42,7 @@ void			parse_cmd(t_client *client, char *buf)
     {
       if (cmd && strcmp(cmds[i].name, cmd) == 0)
 	{
-	  if (client->fd == 0 && strcmp(cmd, "/server") != 0)
-	    printf("You need to be connected before doing this !\n");
-	  else
-	    cmds[i].p(client, arg_one, arg_two);
+	  cmds[i].p(client, arg_one, arg_two);
 	  valid = 1;
 	}
       i++;
@@ -58,8 +55,8 @@ void			client_read(t_client *client)
 {
   char			*buf;
   int			size;
-  FILE			*fp;
   size_t		n;
+  FILE			*fp;
 
   n = 4096;
 
@@ -74,7 +71,7 @@ void			client_read(t_client *client)
 	  parse_cmd(client, buf);
 	}
       else
-	  circbuff_write(&(client->circbuff), buf);
+	  circbuff_write(&(client->circbuff_read), buf);
       printf("%s\n", buf);
     }
   /*
@@ -96,6 +93,8 @@ void			client_read(t_client *client)
     {
       buf[strlen(buf) - 1] = 0;
       printf("Get some data {%d}[%s]\n", (int)size, buf);
+      else if (client->fd != 0)
+	send_buff_client_read(client, buf);
     }
   */
 }
@@ -154,7 +153,7 @@ void			init_fd_set_client
   tmp = tmp->next;
   while (tmp->root == 0)
     {
-      if (tmp->circbuff_r == 1)
+      if (tmp->circbuff_w == 1)
 	FD_SET(tmp->fd, fd_write);
       FD_SET(tmp->fd, fd_read);
       tmp = tmp->next;
@@ -166,27 +165,48 @@ void			fd_action_client
 {
   int			size;
   t_client		*tmp;
-  FILE			*fp;
   char			*buf;
-  size_t		n;
 
   tmp = client;
-  n = 4096;
   //  printf("Action \n");
   while (tmp->root == 0)
     tmp = tmp->next;
   tmp = tmp->next;
   while (tmp->root == 0)
     {
+      if (tmp->circbuff_r == 1)
+	{
+	  printf("Cricbuff Read FD[%d]\n", tmp->fd);
+	  buf = circbuff_read(&(tmp->circbuff_read));
+	  if (buf)
+	    {
+	      size = (int)write(1, buf, strlen(buf));
+	      if (size != (int)strlen(buf))
+		{
+		  tmp->circbuff_read.rpos -= (strlen(buf) - size) - 1;
+		  tmp->circbuff_r = 1;
+		}
+	      else
+		tmp->circbuff_r = 0;
+	    }
+	}
       if (FD_ISSET(0, fd_read))
       	client_read(tmp);
       if (FD_ISSET(tmp->fd, fd_write) && tmp->fd != 0)
 	{
-	  printf("Action \n");
-	  fp = fdopen(tmp->fd, "r");
-	  size = getline(&buf, &n, fp);
-	  if (size > 0)
-	    write(1, buf, size);
+	  printf("Cricbuff Write FD[%d]\n", tmp->fd);
+	  buf = circbuff_read(&(tmp->circbuff_write));
+	  if (buf)
+	    {
+	      size = (int)write(tmp->fd, buf, strlen(buf));
+	      if (size != (int)strlen(buf))
+		{
+		  tmp->circbuff_write.rpos -= (strlen(buf) - size) - 1;
+		  tmp->circbuff_w = 1;
+		}
+	      else
+		tmp->circbuff_w = 0;
+	    }
 	}
       tmp = tmp->next;
     }

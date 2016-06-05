@@ -5,22 +5,30 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Sat Jun  4 19:23:47 2016
-** Last update Sat Jun  4 19:42:07 2016 
+** Last update Sun Jun  5 12:26:32 2016 
 */
 
 #include "../../includes/irc.h"
 
 void	client_msg(t_client *client, char *nick, char *ok)
 {
+  char	*str;
+
   if (nick != NULL && ok != NULL)
-    dprintf(client->fd, "MSG %s %s\r\n", nick, ok);
+    {
+      asprintf(&str, "MSG %s %s\r\n", nick, ok);
+      send_buff_client_write(client, str);
+    }
 }
 
 void	client_quit(t_client *client, char *nick, char *ok)
 {
+  char	*str;
+
   (void) ok;
   (void) nick;
-  dprintf(client->fd, "QUIT\r\n");
+  asprintf(&str, "QUIT\r\n");
+  send_buff_client_write(client, str);
 }
 
 void	client_help(t_client *client, char *nick, char *ok)

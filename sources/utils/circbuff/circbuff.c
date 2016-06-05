@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Wed May 18 21:29:44 2016  Julien Kast
-** Last update Sat Jun  4 13:26:43 2016 
+** Last update Sun Jun  5 12:38:05 2016 
 */
 
 #include	"utils_circbuff.h"
@@ -28,7 +28,6 @@ t_circbuff	circbuff_create(int size)
 
 int		circbuff_write(t_circbuff *data, char *str)
 {
-  printf("CIRCBUFF W[%d]\n", data->wpos);
   while (*str)
     {
       data->buffer[data->wpos] = *str;
@@ -38,7 +37,6 @@ int		circbuff_write(t_circbuff *data, char *str)
 	data->wpos = 0;
     }
   data->buffer[data->wpos] = 0;
-  printf("CIRCBUFF W[%d]\n", data->wpos);
   return (1);
 }
 
@@ -54,7 +52,6 @@ static int	circbuff_len(t_circbuff *data)
   while (c && data->rpos < (data->maxLen + 1))
     {
       c = data->buffer[data->rpos];
-      printf("CIRCBUFF LEN Char[%c] Pos[%d]\n", c, data->rpos);
       if (len == 1 && c == 0)
 	while (c == 0)
 	  c = data->buffer[data->rpos++];
@@ -79,7 +76,6 @@ char		*circbuff_read(t_circbuff *data)
   tmp = malloc((len) * sizeof(char));
   memset(tmp, 0, len);
   tmp[i] = 0;
-  printf("CIRCBUFF LEN %d\n", len);
   while (i < (len - 2) && data->rpos < (data->maxLen + 1))
     {
       tmp[i] = data->buffer[data->rpos];
