@@ -30,7 +30,8 @@ SRC_SERVER	= 	sources/server/server.c 		\
 			sources/server/writer.c			\
 			sources/server/users.c			\
 			sources/utils/circbuff/circbuff.c	\
-			sources/server/list.c
+			sources/server/list.c			\
+			sources/server/parser.c
 
 OBJ_SERVER	= $(SRC_SERVER:.c=.o)
 
@@ -49,5 +50,6 @@ clean:
 fclean:	clean
 	rm -f $(NAME_SERVER)
 	rm -f client
+	rm -f sources/client/build-Interface-Desktop-Debug/client
 
 re: fclean	all
