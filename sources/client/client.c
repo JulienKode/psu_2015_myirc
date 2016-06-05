@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 16 10:41:14 2016 Julien Karst
-** Last update Sun Jun  5 14:51:20 2016 
+** Last update Sun Jun  5 15:00:13 2016 
 */
 
 #include "../../includes/irc.h"
@@ -65,7 +65,7 @@ void			client_read(t_client *client)
   //  fp = fdopen(client->fd, "r");
   printf("Strct %p\n", client);
   size = 1;
-  while (size > 0)
+  if  (size > 0)
     {
       //      size = getline(&buf, &n, fp);
       size = (int)read(client->fd, buf, 256);
@@ -83,6 +83,8 @@ void			client_read(t_client *client)
 	  //	  printf("ClientRead [%d][%s]\n\n", client->fd, buf);
 	  send_buff_client_read(client, buf);
 	}
+      if (buf[size - 1] == 0)
+	return;
       //printf("%s\n", buf);
     }
   /*
@@ -189,6 +191,7 @@ void			fd_action_client
       if (tmp->circbuff_r == 1)
 	{
 	  printf("Cricbuff Read FD[%d]\n", tmp->fd);
+	  printf("FD[%d] READ[%d] WRITE[%d]\n", tmp->fd, tmp->circbuff_r, tmp->circbuff_w);
 	  buf = circbuff_read(&(tmp->circbuff_read));
 	  if (buf)
 	    {
@@ -203,12 +206,14 @@ void			fd_action_client
 	    }
 	  else
 	    printf("#GROS PROBLEM SI SA PASSE LA\n");
+	  printf("FD[%d] READ[%d] WRITE[%d]\n", tmp->fd, tmp->circbuff_r, tmp->circbuff_w);
 	}
       if (FD_ISSET(0, fd_read))
       	client_read(tmp);
       if (FD_ISSET(tmp->fd, fd_write) && tmp->fd != 0)
 	{
 	  printf("Cricbuff Write FD[%d]\n", tmp->fd);
+	  printf("FD[%d] READ[%d] WRITE[%d]\n", tmp->fd, tmp->circbuff_r, tmp->circbuff_w);
 	  buf = circbuff_read(&(tmp->circbuff_write));
 	  if (buf)
 	    {
@@ -221,6 +226,7 @@ void			fd_action_client
 	      else
 		tmp->circbuff_w = 0;
 	    }
+	  printf("FD[%d] READ[%d] WRITE[%d]\n", tmp->fd, tmp->circbuff_r, tmp->circbuff_w);
 	}
       tmp = tmp->next;
     }
