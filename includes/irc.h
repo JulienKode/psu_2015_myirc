@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 16 10:40:15 2016 Julien Karst
-** Last update Sun Jun  5 17:29:16 2016 
+** Last update Sun Jun  5 19:52:34 2016 
 */
 
 #ifndef			IRC_H_
@@ -117,6 +117,7 @@ void			client_server(t_client *, char*, char *);
 void			create_client(t_client*, int);
 void			fd_action_client(t_client *client, fd_set *fd_read, fd_set *fd_write);
 void			init_fd_set_client(t_client *client, fd_set *fd_read, fd_set *fd_write);
+char			*get_buff_read_underground(t_client *);
 t_client		*found_client_by_name(t_client*, char*);
 t_client		*init_list_client();
 t_client		*found_client_by_fd(t_client*, int);
