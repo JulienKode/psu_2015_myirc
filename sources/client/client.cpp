@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 16 10:41:14 2016 Julien Karst
-// Last update Sun Jun  5 17:00:01 2016 
+// Last update Sun Jun  5 17:25:46 2016 
 */
 
 #include "../../includes/irc.h"
@@ -119,6 +119,7 @@ void			client_server(t_client *tmp, char *ip, char *port)
 	  printf("Can't establish connection to %s:%s\n", ip, port);
 	  close(client->fd);
 	  client->fd = 0;
+	  client->fd_type = FD_FREE;
 	  return;
 	}
     }
@@ -132,8 +133,6 @@ void			init_fd_set_client
   tmp = client;
   FD_ZERO(fd_read);
   FD_ZERO(fd_write);
-//  FD_SET(0, fd_read);
-  //  printf("INIT \n");
   while (tmp->root == 0)
     tmp = tmp->next;
   tmp = tmp->next;
