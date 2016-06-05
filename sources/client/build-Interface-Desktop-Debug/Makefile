@@ -142,9 +142,9 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		../list.cpp \
 		../send_buff.cpp \
 		../circbuff.cpp
-QMAKE_TARGET  = Interface
+QMAKE_TARGET  = client
 DESTDIR       = #avoid trailing-slash linebreak
-TARGET        = Interface
+TARGET        = client
 
 
 first: all

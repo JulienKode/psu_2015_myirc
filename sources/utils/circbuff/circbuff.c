@@ -8,6 +8,7 @@
 ** Last update Jan Jun 5 22:09:11 2016 Julien Karst
 */
 
+#include	<string.h>
 #include	"utils_circbuff.h"
 
 t_circbuff	circbuff_create(int size)
