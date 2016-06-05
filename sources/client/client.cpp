@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 16 10:41:14 2016 Julien Karst
-// Last update Sun Jun  5 16:47:29 2016 
+// Last update Sun Jun  5 17:00:01 2016 
 */
 
 #include "../../includes/irc.h"
@@ -56,8 +56,13 @@ void			client_read(t_client *client)
 {
   char			buf[256];
   int			size;
+  //FILE			*fp;
+  //  size_t		n;
 
   size = 1;
+  //  buf = NULL;
+  //  n = 4096;
+  //  fp = fdopen(client->fd, "r");
   if  (size > 0)
     {
       size = (int)read(client->fd, buf, 256);
@@ -134,10 +139,12 @@ void			init_fd_set_client
   tmp = tmp->next;
   while (tmp->root == 0)
     {
-      //      printf("FD[%d] READ[%d] WRITE[%d]\n", tmp->fd, tmp->circbuff_r, tmp->circbuff_w);
-      if (tmp->circbuff_w == 1)
-	FD_SET(tmp->fd, fd_write);
-      FD_SET(tmp->fd, fd_read);
+      if (tmp->fd_type != FD_FREE)
+	{
+	  if (tmp->circbuff_w == 1)
+	    FD_SET(tmp->fd, fd_write);
+	  FD_SET(tmp->fd, fd_read);
+	}
       tmp = tmp->next;
     }
 }
@@ -156,28 +163,8 @@ void			fd_action_client
   tmp = tmp->next;
   while (tmp->root == 0)
     {
-      if (tmp->circbuff_r == 1)
-	{
-	  printf("Cricbuff Read FD[%d]\n", tmp->fd);
-	  printf("FD[%d] READ[%d] WRITE[%d]\n", tmp->fd, tmp->circbuff_r, tmp->circbuff_w);
-	  buf = circbuff_read(&(tmp->circbuff_read));
-	  if (buf)
-	    {
-	      size = (int)write(1, buf, strlen(buf));
-	      if (size != (int)strlen(buf))
-		{
-		  tmp->circbuff_read.rpos -= (strlen(buf) - size) - 1;
-		  tmp->circbuff_r = 1;
-		}
-	      else
-		tmp->circbuff_r = 0;
-	    }
-	  else
-	    printf("#GROS PROBLEM SI SA PASSE LA\n");
-	  printf("FD[%d] READ[%d] WRITE[%d]\n", tmp->fd, tmp->circbuff_r, tmp->circbuff_w);
-	}
-   //   if (FD_ISSET(0, fd_read))
-     // 	client_read(tmp);
+      if (FD_ISSET(tmp->fd, fd_read))
+      	client_read(tmp);
       if (FD_ISSET(tmp->fd, fd_write) && tmp->fd != 0)
 	{
 	  printf("Cricbuff Write FD[%d]\n", tmp->fd);
