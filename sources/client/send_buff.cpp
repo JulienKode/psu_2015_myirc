@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Sat Jun  4 16:34:17 2016
-** Last update Sun Jun 05 23:14:49 2016 Julien Karst
+** Last update Sun Jun 05 23:20:12 2016 Julien Karst
 */
 
 #include	"../../includes/irc.h"
@@ -74,7 +74,7 @@ char		*get_buff_read_underground(t_client *client)
       }
       if (strlen(tmp) == strlen(str))
 	{
-	  client->circbuff_r = 0;
+	  client->circbuff_r = 1;
 	  return (NULL);
 	}
       if (check_conform(tmp) == 0)
@@ -88,7 +88,7 @@ char		*get_buff_read_underground(t_client *client)
           client->circbuff_r = 1;
         }
       else
-	client->circbuff_r = 0;
+	client->circbuff_r = 1;
     }
   return (tmp);
 }
