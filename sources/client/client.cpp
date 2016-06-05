@@ -1,11 +1,11 @@
 /*
-1;2802;0c** main.c for  in /home/karst_j/PSU_2015_myirc/sources
+** main.c for  in /home/karst_j/PSU_2015_myirc/sources
 **
 ** Made by Julien Karst
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 16 10:41:14 2016 Julien Karst
-** Last update Sun Jun  5 15:00:13 2016
+// Last update Sun Jun  5 16:47:29 2016 
 */
 
 #include "../../includes/irc.h"
@@ -56,18 +56,10 @@ void			client_read(t_client *client)
 {
   char			buf[256];
   int			size;
-  //  size_t		n;
-  //  FILE			*fp;
 
-  //  n = 4096;
-
-  //  buf = NULL;
-  //  fp = fdopen(client->fd, "r");
-  printf("Strct %p\n", client);
   size = 1;
   if  (size > 0)
     {
-      //      size = getline(&buf, &n, fp);
       size = (int)read(client->fd, buf, 256);
       printf("CHECK[%d][%d]", buf[size], buf[size - 1]);
       buf[size] = 0;
@@ -80,36 +72,11 @@ void			client_read(t_client *client)
 	}
       else if (client->fd != 0)
 	{
-	  //	  printf("ClientRead [%d][%s]\n\n", client->fd, buf);
 	  send_buff_client_read(client, buf);
 	}
       if (buf[size - 1] == 0)
 	return;
-      //printf("%s\n", buf);
     }
-  /*
-    char			line[256];
-    size = 0;
-  while (fgets(line, sizeof(line), fp))
-    {
-      printf("Buff[%s]Line[%s]\n", buf, line);
-      if (size == 0)
-	asprintf(&buf, "%s", line);
-      else
-	asprintf(&buf, "%s%s", buf, line);
-      size++;
-    }
-  printf("BuffFinal[%s]\n", buf);
-  if (buf[0] == '/')
-    parse_cmd(client, buf);
-  else
-    {
-      buf[strlen(buf) - 1] = 0;
-      printf("Get some data {%d}[%s]\n", (int)size, buf);
-      else if (client->fd != 0)
-	send_buff_client_read(client, buf);
-    }
-  */
 }
 
 void			client_server(t_client *tmp, char *ip, char *port)
@@ -129,6 +96,7 @@ void			client_server(t_client *tmp, char *ip, char *port)
     {
       if (strcmp(ip, "localhost") == 0)
 	ip = strdup("127.0.0.1");
+      client->ip = strdup(ip);
       if (port == NULL)
 	{
 	  printf("Use Default port : 4242\n");

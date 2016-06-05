@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Sat Jun  4 20:51:19 2016
-** Last update Sun Jun  5 12:13:28 2016 
+// Last update Sun Jun  5 16:46:07 2016 
 */
 
 #include	<stdlib.h>
@@ -38,6 +38,8 @@ void		create_client(t_client *root, int fd)
   elem->circbuff_write = circbuff_create(1024);
   elem->circbuff_read = circbuff_create(1024);
   elem->fd = fd;
+  elem->name = NULL;
+  elem->ip = NULL;
   if (fd == -2)
     elem->fd = 0;
   printf("FROM %p NEW %p\n", root, elem);
