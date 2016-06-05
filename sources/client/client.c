@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 16 10:41:14 2016 Julien Karst
-** Last update Sun Jun  5 14:18:41 2016 
+** Last update Sun Jun  5 14:41:08 2016 
 */
 
 #include "../../includes/irc.h"
@@ -38,6 +38,7 @@ void			parse_cmd(t_client *client, char *buf)
   arg_two = strtok(NULL, " \t");
   i = 0;
   valid = 0;
+  printf("CMD [%s]\n", cmd);
   while (i < 11)/*CMD_CLIENT_NUMBER)*/
     {
       if (cmd && strcmp(cmds[i].name, cmd) == 0)
@@ -63,19 +64,23 @@ void			client_read(t_client *client)
   buf = NULL;
   fp = fdopen(client->fd, "r");
   printf("Strct %p\n", client);
-  if ((size = getline(&buf, &n, fp)) > 0)
+  size = 1;
+  while (size > 0)
     {
+      size = getline(&buf, &n, fp);
+      printf("BIG DEbug %d\n%s\n\n", size, buf);
       if (buf[0] == '/')
 	{
 	  buf[size - 1] = 0;
 	  parse_cmd(client, buf);
+	  return;
 	}
       else if (client->fd != 0)
 	{
-	  printf("ClientRead [%d][%s]\n\n", client->fd, buf);
+	  //	  printf("ClientRead [%d][%s]\n\n", client->fd, buf);
 	  send_buff_client_read(client, buf);
 	}
-      printf("%s\n", buf);
+      //printf("%s\n", buf);
     }
   /*
     char			line[256];
@@ -193,6 +198,8 @@ void			fd_action_client
 	      else
 		tmp->circbuff_r = 0;
 	    }
+	  else
+	    printf("#GROS PROBLEM SI SA PASSE LA\n");
 	}
       if (FD_ISSET(0, fd_read))
       	client_read(tmp);
