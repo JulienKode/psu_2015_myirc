@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 16 10:41:14 2016 Julien Karst
-// Last update Sun Jun  5 17:25:46 2016 
+// Last update Sun Jun  5 17:25:46 2016
 */
 
 #include "../../includes/irc.h"
@@ -67,7 +67,7 @@ void			client_read(t_client *client)
     {
       size = (int)read(client->fd, buf, 256);
       printf("CHECK[%d][%d]", buf[size], buf[size - 1]);
-      buf[size] = 0;
+      buf[size - 1] = 0;
       printf("BIG DEbug %d\n%s\n\n", size, buf);
       if (buf[0] == '/')
 	{
