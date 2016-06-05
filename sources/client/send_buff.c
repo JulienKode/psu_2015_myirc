@@ -8,7 +8,7 @@
 ** Last update Sat Jun  4 22:37:54 2016 
 */
 
-#include	"irc.h"
+#include	"../../includes/irc.h"
 
 void		send_buff_client(t_client *client, char *str)
 {

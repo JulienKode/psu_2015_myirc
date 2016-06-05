@@ -8,7 +8,7 @@
 ** Last update Sun Jun  5 01:42:19 2016 
 */
 
-#include "irc.h"
+#include "../../includes/irc.h"
 
 t_cmd                   cmds[] =
   {
@@ -192,7 +192,7 @@ void			fd_action_client
     }
 }
 
-int			main()
+int			main_loop()
 {
   t_client		*client;
   fd_set		fd_read;

@@ -17,9 +17,9 @@
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
-#include <QtWidgets/QListWidget>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QTabWidget>
+#include <QtWidgets/QTextEdit>
 #include <QtWidgets/QTreeWidget>
 #include <QtWidgets/QWidget>
 
@@ -35,18 +35,18 @@ public:
     QPushButton *connect;
     QTabWidget *chat;
     QWidget *tab;
-    QListWidget *listWidget_3;
+    QTextEdit *textEdit;
     QWidget *tab_2;
-    QListWidget *listWidget_2;
+    QPushButton *smileys;
 
     void setupUi(QDialog *Interface)
     {
         if (Interface->objectName().isEmpty())
             Interface->setObjectName(QStringLiteral("Interface"));
-        Interface->resize(763, 497);
+        Interface->resize(763, 494);
         message = new QLineEdit(Interface);
         message->setObjectName(QStringLiteral("message"));
-        message->setGeometry(QRect(120, 460, 541, 27));
+        message->setGeometry(QRect(120, 460, 491, 27));
         label = new QLabel(Interface);
         label->setObjectName(QStringLiteral("label"));
         label->setGeometry(QRect(20, 465, 91, 17));
@@ -64,20 +64,20 @@ public:
         chat->setGeometry(QRect(190, 10, 561, 441));
         tab = new QWidget();
         tab->setObjectName(QStringLiteral("tab"));
-        listWidget_3 = new QListWidget(tab);
-        listWidget_3->setObjectName(QStringLiteral("listWidget_3"));
-        listWidget_3->setGeometry(QRect(-1, -1, 561, 411));
+        textEdit = new QTextEdit(tab);
+        textEdit->setObjectName(QStringLiteral("textEdit"));
+        textEdit->setGeometry(QRect(0, 0, 561, 411));
         chat->addTab(tab, QString());
         tab_2 = new QWidget();
         tab_2->setObjectName(QStringLiteral("tab_2"));
-        listWidget_2 = new QListWidget(tab_2);
-        listWidget_2->setObjectName(QStringLiteral("listWidget_2"));
-        listWidget_2->setGeometry(QRect(-1, -1, 561, 411));
         chat->addTab(tab_2, QString());
+        smileys = new QPushButton(Interface);
+        smileys->setObjectName(QStringLiteral("smileys"));
+        smileys->setGeometry(QRect(615, 460, 51, 27));
 
         retranslateUi(Interface);
 
-        chat->setCurrentIndex(0);
+        chat->setCurrentIndex(1);
 
 
         QMetaObject::connectSlotsByName(Interface);
@@ -94,6 +94,7 @@ public:
         connect->setText(QApplication::translate("Interface", "Connect", 0));
         chat->setTabText(chat->indexOf(tab), QApplication::translate("Interface", "Tab 1", 0));
         chat->setTabText(chat->indexOf(tab_2), QApplication::translate("Interface", "Tab 2", 0));
+        smileys->setText(QString());
     } // retranslateUi
 
 };

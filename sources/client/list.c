@@ -9,7 +9,7 @@
 */
 
 #include	<stdlib.h>
-#include	"irc.h"
+#include	"../../includes/irc.h"
 
 t_client	*init_list_client()
 {

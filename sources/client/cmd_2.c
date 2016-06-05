@@ -8,7 +8,7 @@
 ** Last update Sat Jun  4 19:42:07 2016 
 */
 
-#include "irc.h"
+#include "../../includes/irc.h"
 
 void	client_msg(t_client *client, char *nick, char *ok)
 {

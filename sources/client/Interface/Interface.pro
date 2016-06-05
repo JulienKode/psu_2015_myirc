@@ -15,11 +15,21 @@ TEMPLATE = app
 SOURCES += main.cpp\
         interface.cpp \
     connection.cpp \
-    ../client.c
+    ../client.c \
+    ../cmd.c \
+    ../list.c \
+    ../send_buff.c \
+    ../../utils/circbuff/circbuff.c \
+    ../cmd_2.c \
+    smileylist.cpp
 
 HEADERS  += interface.h \
     connection.h \
-    ../../../includes/irc.h
+    ../../../includes/irc.h \
+    smileylist.h
 
 FORMS    += interface.ui \
-    connection.ui
+    connection.ui \
+    smileylist.ui
+
+DISTFILES +=

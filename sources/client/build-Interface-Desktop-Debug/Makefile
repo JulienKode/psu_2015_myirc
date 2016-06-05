@@ -51,14 +51,28 @@ OBJECTS_DIR   = ./
 SOURCES       = ../Interface/main.cpp \
 		../Interface/interface.cpp \
 		../Interface/connection.cpp \
-		../client.c moc_interface.cpp \
-		moc_connection.cpp
+		../client.c \
+		../cmd.c \
+		../list.c \
+		../send_buff.c \
+		../../utils/circbuff/circbuff.c \
+		../cmd_2.c \
+		../Interface/smileylist.cpp moc_interface.cpp \
+		moc_connection.cpp \
+		moc_smileylist.cpp
 OBJECTS       = main.o \
 		interface.o \
 		connection.o \
 		client.o \
+		cmd.o \
+		list.o \
+		send_buff.o \
+		circbuff.o \
+		cmd_2.o \
+		smileylist.o \
 		moc_interface.o \
-		moc_connection.o
+		moc_connection.o \
+		moc_smileylist.o
 DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/unix.conf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/linux.conf \
@@ -117,10 +131,17 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/lex.prf \
 		../Interface/Interface.pro ../Interface/interface.h \
 		../Interface/connection.h \
-		../../../includes/irc.h ../Interface/main.cpp \
+		../../../includes/irc.h \
+		../Interface/smileylist.h ../Interface/main.cpp \
 		../Interface/interface.cpp \
 		../Interface/connection.cpp \
-		../client.c
+		../client.c \
+		../cmd.c \
+		../list.c \
+		../send_buff.c \
+		../../utils/circbuff/circbuff.c \
+		../cmd_2.c \
+		../Interface/smileylist.cpp
 QMAKE_TARGET  = Interface
 DESTDIR       = #avoid trailing-slash linebreak
 TARGET        = Interface
@@ -148,7 +169,7 @@ first: all
 
 ####### Build rules
 
-$(TARGET): ui_interface.h ui_connection.h $(OBJECTS)  
+$(TARGET): ui_interface.h ui_connection.h ui_smileylist.h $(OBJECTS)  
 	$(LINK) $(LFLAGS) -o $(TARGET) $(OBJECTS) $(OBJCOMP) $(LIBS)
 
 Makefile: ../Interface/Interface.pro /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++-64/qmake.conf /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
@@ -286,9 +307,9 @@ dist: distdir FORCE
 distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
-	$(COPY_FILE) --parents ../Interface/interface.h ../Interface/connection.h ../../../includes/irc.h $(DISTDIR)/
-	$(COPY_FILE) --parents ../Interface/main.cpp ../Interface/interface.cpp ../Interface/connection.cpp ../client.c $(DISTDIR)/
-	$(COPY_FILE) --parents ../Interface/interface.ui ../Interface/connection.ui $(DISTDIR)/
+	$(COPY_FILE) --parents ../Interface/interface.h ../Interface/connection.h ../../../includes/irc.h ../Interface/smileylist.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../Interface/main.cpp ../Interface/interface.cpp ../Interface/connection.cpp ../client.c ../cmd.c ../list.c ../send_buff.c ../../utils/circbuff/circbuff.c ../cmd_2.c ../Interface/smileylist.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ../Interface/interface.ui ../Interface/connection.ui ../Interface/smileylist.ui $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -311,31 +332,39 @@ check: first
 
 compiler_rcc_make_all:
 compiler_rcc_clean:
-compiler_moc_header_make_all: moc_interface.cpp moc_connection.cpp
+compiler_moc_header_make_all: moc_interface.cpp moc_connection.cpp moc_smileylist.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) moc_interface.cpp moc_connection.cpp
+	-$(DEL_FILE) moc_interface.cpp moc_connection.cpp moc_smileylist.cpp
 moc_interface.cpp: ../../../includes/irc.h \
+		../../../includes/utils_circbuff.h \
 		ui_interface.h \
 		../Interface/interface.h
 	/usr/lib/x86_64-linux-gnu/qt5/bin/moc $(DEFINES) -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++-64 -I/home/malot_k/PSU/psu_2015_myirc/sources/client/Interface -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/5 -I/usr/include/x86_64-linux-gnu/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/x86_64-linux-gnu/5/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include ../Interface/interface.h -o moc_interface.cpp
 
 moc_connection.cpp: ../../../includes/irc.h \
+		../../../includes/utils_circbuff.h \
 		../Interface/interface.h \
 		ui_interface.h \
 		ui_connection.h \
 		../Interface/connection.h
 	/usr/lib/x86_64-linux-gnu/qt5/bin/moc $(DEFINES) -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++-64 -I/home/malot_k/PSU/psu_2015_myirc/sources/client/Interface -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/5 -I/usr/include/x86_64-linux-gnu/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/x86_64-linux-gnu/5/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include ../Interface/connection.h -o moc_connection.cpp
 
+moc_smileylist.cpp: ../Interface/smileylist.h
+	/usr/lib/x86_64-linux-gnu/qt5/bin/moc $(DEFINES) -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++-64 -I/home/malot_k/PSU/psu_2015_myirc/sources/client/Interface -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/5 -I/usr/include/x86_64-linux-gnu/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/x86_64-linux-gnu/5/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include ../Interface/smileylist.h -o moc_smileylist.cpp
+
 compiler_moc_source_make_all:
 compiler_moc_source_clean:
-compiler_uic_make_all: ui_interface.h ui_connection.h
+compiler_uic_make_all: ui_interface.h ui_connection.h ui_smileylist.h
 compiler_uic_clean:
-	-$(DEL_FILE) ui_interface.h ui_connection.h
+	-$(DEL_FILE) ui_interface.h ui_connection.h ui_smileylist.h
 ui_interface.h: ../Interface/interface.ui
 	/usr/lib/x86_64-linux-gnu/qt5/bin/uic ../Interface/interface.ui -o ui_interface.h
 
 ui_connection.h: ../Interface/connection.ui
 	/usr/lib/x86_64-linux-gnu/qt5/bin/uic ../Interface/connection.ui -o ui_connection.h
+
+ui_smileylist.h: ../Interface/smileylist.ui
+	/usr/lib/x86_64-linux-gnu/qt5/bin/uic ../Interface/smileylist.ui -o ui_smileylist.h
 
 compiler_yacc_decl_make_all:
 compiler_yacc_decl_clean:
@@ -349,6 +378,7 @@ compiler_clean: compiler_moc_header_clean compiler_uic_clean
 
 main.o: ../Interface/main.cpp ../Interface/interface.h \
 		../../../includes/irc.h \
+		../../../includes/utils_circbuff.h \
 		ui_interface.h \
 		../Interface/connection.h \
 		ui_connection.h
@@ -356,6 +386,7 @@ main.o: ../Interface/main.cpp ../Interface/interface.h \
 
 interface.o: ../Interface/interface.cpp ../Interface/interface.h \
 		../../../includes/irc.h \
+		../../../includes/utils_circbuff.h \
 		ui_interface.h \
 		../Interface/connection.h \
 		ui_connection.h
@@ -363,19 +394,47 @@ interface.o: ../Interface/interface.cpp ../Interface/interface.h \
 
 connection.o: ../Interface/connection.cpp ../Interface/connection.h \
 		../../../includes/irc.h \
+		../../../includes/utils_circbuff.h \
 		../Interface/interface.h \
 		ui_interface.h \
 		ui_connection.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o connection.o ../Interface/connection.cpp
 
-client.o: ../client.c 
+client.o: ../client.c ../../../includes/irc.h \
+		../../../includes/utils_circbuff.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o client.o ../client.c
+
+cmd.o: ../cmd.c ../../../includes/irc.h \
+		../../../includes/utils_circbuff.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o cmd.o ../cmd.c
+
+list.o: ../list.c ../../../includes/irc.h \
+		../../../includes/utils_circbuff.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o list.o ../list.c
+
+send_buff.o: ../send_buff.c ../../../includes/irc.h \
+		../../../includes/utils_circbuff.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o send_buff.o ../send_buff.c
+
+circbuff.o: ../../utils/circbuff/circbuff.c ../../../includes/utils_circbuff.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o circbuff.o ../../utils/circbuff/circbuff.c
+
+cmd_2.o: ../cmd_2.c ../../../includes/irc.h \
+		../../../includes/utils_circbuff.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o cmd_2.o ../cmd_2.c
+
+smileylist.o: ../Interface/smileylist.cpp ../Interface/smileylist.h \
+		ui_smileylist.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o smileylist.o ../Interface/smileylist.cpp
 
 moc_interface.o: moc_interface.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_interface.o moc_interface.cpp
 
 moc_connection.o: moc_connection.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_connection.o moc_connection.cpp
+
+moc_smileylist.o: moc_smileylist.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_smileylist.o moc_smileylist.cpp
 
 ####### Install
 

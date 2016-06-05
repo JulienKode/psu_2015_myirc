@@ -18,6 +18,8 @@ class Interface : public QDialog
 public:
     explicit Interface(t_client *, QWidget *parent = 0);
     ~Interface();
+    void addText(char *tab, char *msg);
+    std::string format_message(char *m);
 private slots:
     void on_send_clicked();
 
@@ -27,7 +29,10 @@ private slots:
 
     void on_chat_tabCloseRequested(int index);
 
+    void on_smileys_clicked();
+
 private:
+    std::map<std::string, std::string> smileys;
     t_client *client;
     Ui::Interface *ui;
 };
