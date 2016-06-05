@@ -20,7 +20,7 @@
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_SmileyList_t {
     QByteArrayData data[5];
-    char stringdata0[54];
+    char stringdata0[52];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -30,13 +30,13 @@ struct qt_meta_stringdata_SmileyList_t {
 static const qt_meta_stringdata_SmileyList_t qt_meta_stringdata_SmileyList = {
     {
 QT_MOC_LITERAL(0, 0, 10), // "SmileyList"
-QT_MOC_LITERAL(1, 11, 19), // "on_list_itemClicked"
-QT_MOC_LITERAL(2, 31, 0), // ""
-QT_MOC_LITERAL(3, 32, 16), // "QListWidgetItem*"
-QT_MOC_LITERAL(4, 49, 4) // "item"
+QT_MOC_LITERAL(1, 11, 17), // "itemClickedSmiley"
+QT_MOC_LITERAL(2, 29, 0), // ""
+QT_MOC_LITERAL(3, 30, 16), // "QListWidgetItem*"
+QT_MOC_LITERAL(4, 47, 4) // "item"
 
     },
-    "SmileyList\0on_list_itemClicked\0\0"
+    "SmileyList\0itemClickedSmiley\0\0"
     "QListWidgetItem*\0item"
 };
 #undef QT_MOC_LITERAL
@@ -69,7 +69,7 @@ void SmileyList::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         SmileyList *_t = static_cast<SmileyList *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
-        case 0: _t->on_list_itemClicked((*reinterpret_cast< QListWidgetItem*(*)>(_a[1]))); break;
+        case 0: _t->itemClickedSmiley((*reinterpret_cast< QListWidgetItem*(*)>(_a[1]))); break;
         default: ;
         }
     }

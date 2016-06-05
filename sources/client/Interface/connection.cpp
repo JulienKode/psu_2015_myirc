@@ -47,7 +47,10 @@ void Connection::on_connect_clicked()
     {
         client_server(client, (char*) ui->address->text().toStdString().c_str(), (char *)ui->port->text().toStdString().c_str());
         if (list_count(client) == nb_serv)
+        {
+            QMessageBox::warning(this, tr("Error"), "Can't establish connecton with " + ui->address->text());
             return;
+        }
         tmp = client;
         while (tmp->root == 0)
           tmp = tmp->next;
@@ -66,6 +69,7 @@ void Connection::on_connect_clicked()
         client_nick(tmp, (char *)ui->nick->text().toStdString().c_str(), NULL);
         parent_ui->chat->addTab(textEdit, QIcon("../ico/server.png"), ui->name->text());
         QTreeWidgetItem *server = addTreeRoot(parent_ui->channels, ui->name->text(), ui->address->text());
+        //client_list(tmp, NULL, NULL);
         // LIST + addTreeChild de tous les channels
         QTreeWidgetItem *channel = addTreeChild(server, "TEST CHANNEL" + ui->name->text(), Qt::white, "../ico/channel.png");
         // NAMES de tous les channels + addTreeChild

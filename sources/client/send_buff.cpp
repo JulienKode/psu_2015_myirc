@@ -5,10 +5,11 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Sat Jun  4 16:34:17 2016
-// Last update Sun Jun  5 21:47:03 2016 
+** Last update Sun Jun  5 21:13:49 2016
 */
 
 #include	"../../includes/irc.h"
+#include	<string>
 
 void		send_buff_client_write(t_client *client, char *str)
 {
@@ -59,12 +60,12 @@ char		*get_buff_read_underground(t_client *client)
 	  return (NULL);
 	}
       if (strlen(tmp) != strlen(str))
-	{
-	  client->circbuff_read.rpos -= (strlen(str) - strlen(tmp)) - 1;
-	  client->circbuff_r = 1;
-	}
+        {
+          client->circbuff_read.rpos -= (strlen(str) - strlen(tmp)) - 1;
+          client->circbuff_r = 1;
+        }
       else
-	  client->circbuff_r = 0;
+	client->circbuff_r = 0;
     }
   return (tmp);
 }

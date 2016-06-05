@@ -36,7 +36,7 @@ void	client_help(t_client *client, char *nick, char *ok)
   (void) client;
   (void) ok;
   (void) nick;
-  printf("HELP Command\n");
+  printf("Command not implemented yet\n");
 }
 
 void	client_send(t_client *client, char *nick, char *ok)
@@ -44,7 +44,7 @@ void	client_send(t_client *client, char *nick, char *ok)
   (void) client;
   (void) ok;
   (void) nick;
-  printf("HELP Command\n");
+  printf("Command not implemented yet\n");
 }
 
 void	client_accept(t_client *client, char *nick, char *ok)
@@ -52,5 +52,5 @@ void	client_accept(t_client *client, char *nick, char *ok)
   (void) client;
   (void) ok;
   (void) nick;
-  printf("HELP Command\n");
+  printf("Command not implemented yet\n");
 }
