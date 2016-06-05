@@ -68,7 +68,6 @@ void Interface::refresh()
                 buf = circbuff_read(&(tmp->circbuff_read));
                 if (buf)
                   {
-                    std::cout << "Quelque chose à lire !" << std::endl;
                     addText(tmp->name, buf);
                     tmp->circbuff_r = 0;
                   }
@@ -185,13 +184,10 @@ void Interface::addText(char *tab, char *msg)
         if (ui->chat->tabText(i) == QString(tab)) // A Tester : Que si les deux sont sur le même serveur.
             break;
    }
-   if (i != ui->chat->count())
-   {
-       QTextEdit *textEditor = dynamic_cast<QTextEdit *>(ui->chat->widget(i));
-       textEditor->moveCursor (QTextCursor::End);
-       textEditor->textCursor().insertHtml(QString(format_message(msg).c_str()) + "<br>");
-       textEditor->moveCursor (QTextCursor::End);
-   }
+   QTextEdit *textEditor = dynamic_cast<QTextEdit *>(ui->chat->widget(i - 1));
+   textEditor->moveCursor (QTextCursor::End);
+   textEditor->textCursor().insertHtml(QString(format_message(msg).c_str()) + "<br>");
+   textEditor->moveCursor (QTextCursor::End);
 }
 
 void Interface::on_channels_itemDoubleClicked(QTreeWidgetItem *item, int column)

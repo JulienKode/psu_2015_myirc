@@ -52,17 +52,18 @@ void Connection::on_connect_clicked()
         while (tmp->root == 0)
           tmp = tmp->next;
         tmp = tmp->next->next;
+        if (ui->address->text().toStdString() == "localhost")
+            ui->address->setText("127.0.0.1");
         while (tmp->root == 0)
         {
             if (tmp->fd_type != FD_FREE && std::string(tmp->ip) == ui->address->text().toStdString() && tmp->name == NULL)
               {
-                 std::cout << tmp->ip << " => " << tmp->name << std::endl;
                 tmp->name = (char *)(ui->name->text().toStdString().c_str());
                 break;
               }
             tmp = tmp->next;
          }
-//        client_nick(tmp, (char *)ui->nick->text().toStdString().c_str(), NULL);
+        client_nick(tmp, (char *)ui->nick->text().toStdString().c_str(), NULL);
         parent_ui->chat->addTab(textEdit, QIcon("../ico/server.png"), ui->name->text());
         QTreeWidgetItem *server = addTreeRoot(parent_ui->channels, ui->name->text(), ui->address->text());
         // LIST + addTreeChild de tous les channels
