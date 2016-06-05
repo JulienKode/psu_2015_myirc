@@ -57,6 +57,48 @@ Interface::Interface(t_client *client, fd_set *fd_read, fd_set *fd_write, QWidge
      timer->start(100);
 }
 
+void Interface::addText(char *tab, char *msg)
+{
+   int i;
+   for (i = 0; i < ui->chat->count(); i++)
+   {
+        if (ui->chat->tabText(i) == QString(tab)) // A Tester : Que si les deux sont sur le même serveur.
+            break;
+   }
+   QTextEdit *textEditor = dynamic_cast<QTextEdit *>(ui->chat->widget(i - 1));
+   textEditor->moveCursor (QTextCursor::End);
+   textEditor->textCursor().insertHtml(QString(format_message(msg).c_str()) + "<br>");
+   textEditor->moveCursor (QTextCursor::End);
+}
+
+void Interface::parseCommand(t_client *tmp, char *c)
+{
+    std::string cmd(c);
+    size_t pos1;
+    size_t pos2;
+
+    std::cout << "PARSECOMMAND" << std::endl;
+    if (cmd.find(":") == std::string::npos)
+        return;
+
+    pos1 = cmd.find("!~");
+    pos2 = cmd.find("@localhost");
+    std::cout << "POS : " << pos1 << " " << pos2 << std::endl;
+    if (pos1 != std::string::npos && pos2 != std::string::npos && (pos2 == 2 * pos1))
+    {
+        pos1 = cmd.find("#");
+        if (pos1 != std::string::npos)
+        {
+                pos2 = cmd.find(" ", pos1);
+                if (pos2 != std::string::npos)
+                {
+                    std::cout << "message sur le channel :" + cmd.substr(pos1, pos2);
+                }
+        }
+    }
+        addText(tmp->name, c);
+}
+
 void Interface::refresh()
 {
     struct timeval t;
@@ -79,9 +121,14 @@ void Interface::refresh()
               if (tmp->fd_type != FD_FREE && tmp->circbuff_r == 1)
               {
                   buf = get_buff_read_underground(tmp);
-                  // Avant d'AddText, faire du parsing pour savoir si c'est le retour d'une commande, un message privé ou autre
                   if (buf)
-                    addText(tmp->name, buf);
+                    {
+                      parseCommand(tmp, buf);
+                    }
+                  else
+                  {
+                   std::cout << "BUF NULL !" << std::endl;
+                  }
               }
            tmp = tmp->next;
         }
@@ -193,20 +240,6 @@ QTreeWidgetItem *addTreeChild(QTreeWidgetItem *parent, QString name, Qt::GlobalC
     treeItem->setIcon(0, QIcon(ico));
     parent->addChild(treeItem);
     return treeItem;
-}
-
-void Interface::addText(char *tab, char *msg)
-{
-   int i;
-   for (i = 0; i < ui->chat->count(); i++)
-   {
-        if (ui->chat->tabText(i) == QString(tab)) // A Tester : Que si les deux sont sur le même serveur.
-            break;
-   }
-   QTextEdit *textEditor = dynamic_cast<QTextEdit *>(ui->chat->widget(i - 1));
-   textEditor->moveCursor (QTextCursor::End);
-   textEditor->textCursor().insertHtml(QString(format_message(msg).c_str()) + "<br>");
-   textEditor->moveCursor (QTextCursor::End);
 }
 
 void Interface::on_channels_itemDoubleClicked(QTreeWidgetItem *item, int column)
