@@ -1,4 +1,5 @@
 #include "connection.h"
+#include <iostream>
 
 Connection::Connection(t_client *client, QWidget *parent, Ui::Interface *parent_ui) :
     QDialog(parent),
@@ -28,11 +29,12 @@ void Connection::on_connect_clicked()
         tmp = client;
         while (tmp->root == 0)
           tmp = tmp->next;
-        tmp = tmp->next;
+        tmp = tmp->next->next;
         while (tmp->root == 0)
         {
-            if (std::string(tmp->ip) == ui->address->text().toStdString() && tmp->name == NULL)
+            if (tmp->fd_type != FD_FREE && std::string(tmp->ip) == ui->address->text().toStdString() && tmp->name == NULL)
               {
+                 std::cout << tmp->ip << " => " << tmp->name << std::endl;
                 tmp->name = (char *)(ui->name->text().toStdString().c_str());
                 break;
               }

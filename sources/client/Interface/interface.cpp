@@ -56,10 +56,10 @@ void Interface::refresh()
         init_fd_set_client(client, fd_read, fd_write);
         if (select(MAX_FD + 1, fd_read, fd_write, NULL, &t) == -1)
          exit(42);
-        tmp = client->next;
+        tmp = client->next->next;
         while (tmp->root == 0)
         {
-              if (tmp->circbuff_r == 1)
+              if (tmp->fd_type != FD_FREE && tmp->circbuff_r == 1)
               {
                 buf = circbuff_read(&(tmp->circbuff_read));
                 if (buf)
