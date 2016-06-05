@@ -31,9 +31,6 @@ Interface::Interface(t_client *client, fd_set *fd_read, fd_set *fd_write, QWidge
              smileys["[" + name.substr(0, name.length() - 4) + "]"] = "<img src='../ico/emote/" + name +"'>";
      }
      closedir(pdir);
-     QTimer *timer = new QTimer();
-     timer->connect(timer, SIGNAL(timeout()), this, SLOT(refresh()));
-     timer->start(100);
      ui_setup = false;
      ui->setupUi(this);
      ui_setup = true;
@@ -41,16 +38,40 @@ Interface::Interface(t_client *client, fd_set *fd_read, fd_set *fd_write, QWidge
      ui->chat->removeTab(0);
      ui->chat->removeTab(0);
      ui->smileys->setIcon(QIcon("../ico/emote/happy.png"));
+     QTimer *timer = new QTimer();
+     timer->connect(timer, SIGNAL(timeout()), this, SLOT(refresh()));
+     timer->start(100);
 }
 
 void Interface::refresh()
 {
+    struct timeval t;
+    t_client *tmp;
+    char *buf;
+    t.tv_sec = 0;
+    t.tv_usec = 40;
+
     if (ui_setup)
     {
         init_fd_set_client(client, fd_read, fd_write);
-        if (select(MAX_FD + 1, fd_read, fd_write, NULL, NULL) == -1)
+        if (select(MAX_FD + 1, fd_read, fd_write, NULL, &t) == -1)
          exit(42);
-        fd_action_client(client, fd_read, fd_write);
+        tmp = client->next;
+        while (tmp->root == 0)
+        {
+              if (tmp->circbuff_r == 1)
+              {
+                buf = circbuff_read(&(tmp->circbuff_read));
+                if (buf)
+                  {
+                    // Ecrire dans l'onglet  write(1, buf, strlen(buf));
+                     addText(tmp->name, buf);
+                    tmp->circbuff_r = 0;
+                  }
+              }
+           tmp = tmp->next;
+        }
+    fd_action_client(client, fd_read, fd_write);
     }
 }
 
@@ -152,8 +173,8 @@ void Interface::on_channels_itemDoubleClicked(QTreeWidgetItem *item, int column)
     textEdit->setReadOnly(true);
 
     // TESTS
-  addText("bite", "Je teste un smiley [faux] [bored] mdr je suis fatigué [beer][beer][beer]!");
-  addText("bite", "Lol je veux mon pseudo en couleur bitch ! malot_k Ah ouais ça marche :O malot_k malot_k ");
+  //addText("bite", "Je teste un smiley [faux] [bored] mdr je suis fatigué [beer][beer][beer]!");
+ // addText("bite", "Lol je veux mon pseudo en couleur bitch ! malot_k Ah ouais ça marche :O malot_k malot_k ");
    //
 
     if (item->parent())

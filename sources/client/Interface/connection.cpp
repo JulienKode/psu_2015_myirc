@@ -16,6 +16,7 @@ Connection::~Connection()
 
 void Connection::on_connect_clicked()
 {
+    t_client *tmp;
     QTextEdit *textEdit = new QTextEdit;
     textEdit->setReadOnly(true);
 
@@ -23,8 +24,21 @@ void Connection::on_connect_clicked()
         QMessageBox::warning(this, tr("Error"), "Some parameters are empty.");
     else
     {
-        //client_server(client, (char*) ui->address->text().toStdString().c_str(), (char *)ui->port->text().toStdString().c_str());
-        //client_nick(client,  (char *)ui->nick->text().toStdString().c_str(), NULL);
+        client_server(client, (char*) ui->address->text().toStdString().c_str(), (char *)ui->port->text().toStdString().c_str());
+        tmp = client;
+        while (tmp->root == 0)
+          tmp = tmp->next;
+        tmp = tmp->next;
+        while (tmp->root == 0)
+        {
+            if (std::string(tmp->ip) == ui->address->text().toStdString() && tmp->name == NULL)
+              {
+                tmp->name = (char *)(ui->name->text().toStdString().c_str());
+                break;
+              }
+            tmp = tmp->next;
+         }
+        client_nick(client,  (char *)ui->nick->text().toStdString().c_str(), NULL);
         parent_ui->chat->addTab(textEdit, QIcon("../ico/server.png"), ui->name->text());
         QTreeWidgetItem *server = addTreeRoot(parent_ui->channels, ui->name->text(), ui->address->text());
         // LIST + addTreeChild de tous les channels
