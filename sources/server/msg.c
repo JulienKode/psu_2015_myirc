@@ -29,7 +29,7 @@ static int	msg_gere_error
   msg = NULL;
   if (arg_one == NULL)
     {
-      asprintf(&msg, ":irc.localhost 411 %s :No recipient given (PRIVMSG)"
+      asprintf(&msg, ":irc.localhost 411 %s :No recipient given (PRIVMSG)\r\n"
 	       , chan->nick[fd]);
       circbuff_write(&(data->circbuff[fd]), msg);
       data->circbuff_read[fd] = 1;

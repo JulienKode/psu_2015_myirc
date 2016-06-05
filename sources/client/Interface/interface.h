@@ -21,6 +21,7 @@ public:
     ~Interface();
     void addText(char *tab, char *msg);
     std::string format_message(char *m);
+    void parseCommand(t_client *tmp, char *c);
 private slots:
     void on_send_clicked();
 
