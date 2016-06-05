@@ -5,11 +5,10 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Wed May 18 21:29:44 2016  Julien Kast
-** Last update Jan Jun 5 22:09:11 2016 Julien Karst
+// Last update Sun Jun  5 21:48:07 2016
 */
 
-#include	<string.h>
-#include	"utils_circbuff.h"
+#include	"../../includes/utils_circbuff.h"
 
 t_circbuff	circbuff_create(int size)
 {
@@ -18,11 +17,8 @@ t_circbuff	circbuff_create(int size)
   res.maxLen = size;
   res.rpos = 0;
   res.wpos = 0;
-  if ((res.buffer = malloc((size + 1) * sizeof(char))) == NULL)
-    {
-      res.maxLen = 0;
-      perror("malloc");
-    }
+  const int dataSize = 1024;
+  res.buffer = new char[dataSize];
   return (res);
 }
 
@@ -73,8 +69,8 @@ char		*circbuff_read(t_circbuff *data)
 
   i = 0;
   len = circbuff_len(data);
-  tmp = malloc((len) * sizeof(char));
-  memset(tmp, 0, len);
+  const int dataSize = 1024;
+  tmp = new char[dataSize];
   tmp[i] = 0;
   while (i < (len - 2) && data->rpos < (data->maxLen + 1))
     {

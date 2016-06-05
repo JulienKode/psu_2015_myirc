@@ -5,16 +5,14 @@
 ## Login   <malot_k@epitech.net>
 ## 
 ## Started on  Sun Nov 23 10:06:19 2014 kevin malot
-## Last update Sat Jun  4 17:39:13 2016 
+## Last update Sun Jun  5 22:01:42 2016 
 ##
 
-CFLAGS          += -W -Wall -Wextra -Werror -Iincludes -g
+CFLAGS          += -W -Wall -Wextra -Werror -Iincludes/server -g
 
 LDFLAGS         = 
 
 NAME_SERVER	= server
-
-NAME_CLIENT	= client
 
 SRC_SERVER	= 	sources/server/server.c 		\
 			sources/utils/list.c 			\
@@ -32,28 +30,26 @@ SRC_SERVER	= 	sources/server/server.c 		\
 			sources/server/writer.c			\
 			sources/server/users.c			\
 			sources/utils/circbuff/circbuff.c	\
-			sources/server/list.c
-
-SRC_CLIENT	= sources/server/client.c
+			sources/server/list.c			\
+			sources/server/parser.c
 
 OBJ_SERVER	= $(SRC_SERVER:.c=.o)
 
-OBJ_CLIENT	= $(SRC_CLIENT:.c=.o)
-
-all:	$(NAME_SERVER) $(NAME_CLIENT)
+all:	$(NAME_SERVER) client
 
 $(NAME_SERVER):	$(OBJ_SERVER)
 	cc $(CFLAGS) -o $(NAME_SERVER) $(OBJ_SERVER) $(LDFLAGS)
 
-$(NAME_CLIENT):	$(OBJ_CLIENT)
-	cc $(CFLAGS) -o $(NAME_CLIENT) $(OBJ_CLIENT) $(LDFLAGS)
-
+client:
+	make -C sources/client/build-Interface-Desktop-Debug
+	cp sources/client/build-Interface-Desktop-Debug/client .
 clean:
 	rm -f $(OBJ_SERVER)
-	rm -f $(OBJ_CLIENT)
+	rm -f sources/client/build-Interface-Desktop-Debug/*.o
 
 fclean:	clean
 	rm -f $(NAME_SERVER)
-	rm -f $(NAME_CLIENT)
+	rm -f client
+	rm -f sources/client/build-Interface-Desktop-Debug/client
 
 re: fclean	all

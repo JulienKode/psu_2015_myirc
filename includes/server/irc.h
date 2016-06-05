@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 16 10:40:15 2016 Julien Karst
-** Last update Sun Jun  5 21:48:48 2016 
+** Last update Sun Jun  5 22:02:56 2016
 */
 
 #ifndef			IRC_H_
@@ -16,6 +16,7 @@
 #define			FD_SERVER	2
 #define			MAX_FD		255
 #define			CMD_NUMBER	10
+#define			_GNU_SOURCE
 
 #include		<sys/select.h>
 #include		<sys/time.h>
@@ -74,11 +75,14 @@ typedef struct		s_client
 typedef struct		s_cmd
 {
   char			*name;
-  void			(*p)(t_client *, char *, char *);
+  void			(*p)(int, t_channel *, char *);
 }			t_cmd;
 
 extern t_data		*data;
 
+void			parse_cmd(char *, t_channel *, int);
+void			client_read(t_channel *, int);
+void			add_client(t_channel *, int);
 int			send_user(t_channel*, char*, char*);
 int			nick_exists(t_channel *, char *);
 int			nb_of_users(t_channel*);
