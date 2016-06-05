@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 16 10:41:14 2016 Julien Karst
-** Last update Sun Jun  5 14:41:08 2016 
+** Last update Sun Jun  5 14:51:20 2016 
 */
 
 #include "../../includes/irc.h"
@@ -54,20 +54,23 @@ void			parse_cmd(t_client *client, char *buf)
 
 void			client_read(t_client *client)
 {
-  char			*buf;
+  char			buf[256];
   int			size;
-  size_t		n;
-  FILE			*fp;
+  //  size_t		n;
+  //  FILE			*fp;
 
-  n = 4096;
+  //  n = 4096;
 
-  buf = NULL;
-  fp = fdopen(client->fd, "r");
+  //  buf = NULL;
+  //  fp = fdopen(client->fd, "r");
   printf("Strct %p\n", client);
   size = 1;
   while (size > 0)
     {
-      size = getline(&buf, &n, fp);
+      //      size = getline(&buf, &n, fp);
+      size = (int)read(client->fd, buf, 256);
+      printf("CHECK[%d][%d]", buf[size], buf[size - 1]);
+      buf[size] = 0;
       printf("BIG DEbug %d\n%s\n\n", size, buf);
       if (buf[0] == '/')
 	{
