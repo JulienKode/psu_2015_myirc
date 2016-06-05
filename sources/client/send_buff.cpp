@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Sat Jun  4 16:34:17 2016
-** Last update Sun Jun 05 23:23:53 2016 Julien Karst
+** Last update Sun Jun 05 23:32:43 2016 Julien Karst
 */
 
 #include	"../../includes/irc.h"
@@ -65,6 +65,13 @@ char		*get_buff_read_underground(t_client *client)
   if (str)
     {
       tmp = strtok(strdup(str), "\n");
+    if (isPrintable(tmp) != 0)
+  {
+          printf("TEST %s\n", tmp);
+  	  client->circbuff_read.rpos = save + isPrintable(tmp);
+      client->circbuff_r = 1;
+  	  return (NULL);
+      }
       if (strlen(tmp) == strlen(str))
 	{
 	  client->circbuff_r = 1;
