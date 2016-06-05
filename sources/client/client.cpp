@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 16 10:41:14 2016 Julien Karst
-// Last update Sun Jun  5 17:25:46 2016
+// Last update Sun Jun  5 20:25:32 2016 
 */
 
 #include "../../includes/irc.h"
