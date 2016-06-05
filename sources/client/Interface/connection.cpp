@@ -67,13 +67,13 @@ void Connection::on_connect_clicked()
             tmp = tmp->next;
          }
         client_nick(tmp, (char *)ui->nick->text().toStdString().c_str(), NULL);
-        parent_ui->chat->addTab(textEdit, QIcon("../ico/server.png"), ui->name->text());
+        parent_ui->chat->addTab(textEdit, QIcon("sources/client/ico/server.png"), ui->name->text());
         QTreeWidgetItem *server = addTreeRoot(parent_ui->channels, ui->name->text(), ui->address->text());
         //client_list(tmp, NULL, NULL);
         // LIST + addTreeChild de tous les channels
-        QTreeWidgetItem *channel = addTreeChild(server, "TEST CHANNEL" + ui->name->text(), Qt::white, "../ico/channel.png");
+        QTreeWidgetItem *channel = addTreeChild(server, "TEST CHANNEL" + ui->name->text(), Qt::white, "sources/client/ico/channel.png");
         // NAMES de tous les channels + addTreeChild
-        addTreeChild(channel, "TEST CLIENT" + ui->nick->text(), Qt::white, "../ico/available.png");
+        addTreeChild(channel, "TEST CLIENT" + ui->nick->text(), Qt::white, "sources/client/ico/available.png");
         parent_ui->label->setText(ui->nick->text());
         parent_ui->channels->expandAll();
         parent_ui->channels->resizeColumnToContents(0);

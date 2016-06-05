@@ -18,7 +18,7 @@ Interface::Interface(t_client *client, fd_set *fd_read, fd_set *fd_write, QWidge
      struct dirent *pent;
 
      _select = false;
-     pdir=opendir("../ico/emote");
+     pdir=opendir("sources/client/ico/emote");
      if (!pdir){
      printf ("Smileys loading failure ...");
      exit(1);
@@ -29,10 +29,10 @@ Interface::Interface(t_client *client, fd_set *fd_read, fd_set *fd_write, QWidge
      {
         name = pent->d_name;
         if (name.length() > 4 && name[name.length() - 4] == '.')
-             smileys["[" + name.substr(0, name.length() - 4) + "]"] = "<img src='../ico/emote/" + name +"'>";
+             smileys["[" + name.substr(0, name.length() - 4) + "]"] = "<img src='sources/client/ico/emote/" + name +"'>";
      }
      closedir(pdir);
-     pdir=opendir("../ico/emote/epitech");
+     pdir=opendir("sources/client/ico/emote/epitech");
      if (!pdir){
      printf ("Smileys loading failure ...");
      exit(1);
@@ -42,7 +42,7 @@ Interface::Interface(t_client *client, fd_set *fd_read, fd_set *fd_write, QWidge
      {
         name = pent->d_name;
         if (name.length() > 4 && name[name.length() - 4] == '.')
-             smileyepitech["[" + name.substr(0, name.length() - 4) + "]"] = "<img src='../ico/emote/epitech/" + name +"'>";
+             smileyepitech["[" + name.substr(0, name.length() - 4) + "]"] = "<img src='sources/client/ico/emote/epitech/" + name +"'>";
      }
      closedir(pdir);
      ui_setup = false;
@@ -51,7 +51,7 @@ Interface::Interface(t_client *client, fd_set *fd_read, fd_set *fd_write, QWidge
      ui->chat->setTabsClosable(true);
      ui->chat->removeTab(0);
      ui->chat->removeTab(0);
-     ui->smileys->setIcon(QIcon("../ico/emote/happy.png"));
+     ui->smileys->setIcon(QIcon("sources/client/ico/emote/happy.png"));
      QTimer *timer = new QTimer();
      timer->connect(timer, SIGNAL(timeout()), this, SLOT(refresh()));
      timer->start(100);
@@ -179,7 +179,7 @@ void Interface::on_message_returnPressed()
 QTreeWidgetItem *addTreeRoot(QTreeWidget *tree, QString name, QString description)
 {
     QTreeWidgetItem *treeItem = new QTreeWidgetItem(tree);
-    treeItem->setIcon(0, QIcon("../ico/server.png"));
+    treeItem->setIcon(0, QIcon("sources/client/ico/server.png"));
     treeItem->setText(0, name);
     treeItem->setToolTip(0, description);
     return treeItem;
@@ -225,7 +225,7 @@ void Interface::on_channels_itemDoubleClicked(QTreeWidgetItem *item, int column)
           // JOIN (char *)item->text().toStdString().c_str() sur la socket du serveur item->parent->text().toStdString().c_str()
           // Si JOIN reussit
         //   {
-                ui->chat->addTab(textEdit, QIcon("../ico/channel.png"), item->text(column));
+                ui->chat->addTab(textEdit, QIcon("sources/client/ico/channel.png"), item->text(column));
                //faire un USERS pour remplir la liste des utilisateurs connectés
             //}
         }
@@ -237,7 +237,7 @@ void Interface::on_channels_itemDoubleClicked(QTreeWidgetItem *item, int column)
                  if (ui->chat->tabText(i) == item->text(column)) // A Tester : Que si les deux sont sur le même serveur.
                      return;
                }
-             ui->chat->addTab(textEdit, QIcon("../ico/chat.png"), item->text(column));
+             ui->chat->addTab(textEdit, QIcon("sources/client/ico/chat.png"), item->text(column));
         }
     }
 }

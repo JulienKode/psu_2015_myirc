@@ -16,8 +16,8 @@ SmileyList::SmileyList(QWidget *parent, QLineEdit *edit, std::map<std::string, s
     ui->setupUi(this);
     ui->categories->removeTab(0);
     ui->categories->removeTab(0);
-    ui->categories->addTab(list, QIcon("../ico/emote/happy.png"), "Standard");
-    ui->categories->addTab(list2, QIcon("../ico/emote/epitech/steven.png"), "Epitech");
+    ui->categories->addTab(list, QIcon("sources/client/ico/emote/happy.png"), "Standard");
+    ui->categories->addTab(list2, QIcon("sources/client/ico/emote/epitech/steven.png"), "Epitech");
     std::string path;
     for (std::map<std::string, std::string>::iterator it = smileys.begin(); it != smileys.end(); ++it)
       {
