@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 16 10:41:14 2016 Julien Karst
-** Last update Sun Jun  5 13:57:42 2016
+** Last update Sun Jun  5 14:18:41 2016 
 */
 
 #include "../../includes/irc.h"
@@ -70,8 +70,11 @@ void			client_read(t_client *client)
 	  buf[size - 1] = 0;
 	  parse_cmd(client, buf);
 	}
-      else
-	  circbuff_write(&(client->circbuff_read), buf);
+      else if (client->fd != 0)
+	{
+	  printf("ClientRead [%d][%s]\n\n", client->fd, buf);
+	  send_buff_client_read(client, buf);
+	}
       printf("%s\n", buf);
     }
   /*
@@ -153,6 +156,7 @@ void			init_fd_set_client
   tmp = tmp->next;
   while (tmp->root == 0)
     {
+      //      printf("FD[%d] READ[%d] WRITE[%d]\n", tmp->fd, tmp->circbuff_r, tmp->circbuff_w);
       if (tmp->circbuff_w == 1)
 	FD_SET(tmp->fd, fd_write);
       FD_SET(tmp->fd, fd_read);
