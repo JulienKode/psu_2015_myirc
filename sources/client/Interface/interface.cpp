@@ -68,8 +68,8 @@ void Interface::refresh()
                 buf = circbuff_read(&(tmp->circbuff_read));
                 if (buf)
                   {
-                    // Ecrire dans l'onglet  write(1, buf, strlen(buf));
-                     addText(tmp->name, buf);
+                    std::cout << "Quelque chose à lire !" << std::endl;
+                    addText(tmp->name, buf);
                     tmp->circbuff_r = 0;
                   }
               }
