@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Sat Jun  4 20:51:19 2016
-// Last update Sun Jun  5 17:28:39 2016 
+// Last update Mon Jun  6 01:57:49 2016 
 */
 
 #include	<stdlib.h>
@@ -33,7 +33,7 @@ void		create_client(t_client *root, int fd)
   elem->fd_type = FD_CLIENT;
   if (fd == -2)
     elem->fd_type = FD_FREE;
-  elem->circbuff_r = 0;
+  elem->circbuff_r = 1;
   elem->circbuff_w = 0;
   elem->circbuff_write = circbuff_create(1024);
   elem->circbuff_read = circbuff_create(1024);

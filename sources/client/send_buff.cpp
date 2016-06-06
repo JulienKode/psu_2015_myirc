@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Sat Jun  4 16:34:17 2016
-** Last update Sun Jun 05 23:32:43 2016 Julien Karst
+// Last update Mon Jun  6 01:59:17 2016 
 */
 
 #include	"../../includes/irc.h"
@@ -19,8 +19,18 @@ void		send_buff_client_write(t_client *client, char *str)
 
 void		send_buff_client_read(t_client *client, char *str)
 {
+  char		*tmp;
+
+  tmp = str;
+  printf("Defore circbuff = %d [%s]\n", client->circbuff_r, tmp);
+  while (*tmp)
+    {
+      if (*tmp == '\n')
+	client->circbuff_r++;
+      tmp++;
+    }
+  printf("After circbuff = %d\n", client->circbuff_r);
   circbuff_write(&(client->circbuff_read), str);
-  client->circbuff_r = 1;
 }
 
 static int	check_conform(char *str)
@@ -56,39 +66,20 @@ static int  isPrintable(char *str)
 char		*get_buff_read_underground(t_client *client)
 {
   int		save;
-  char		*tmp;
   char		*str;
 
-  tmp = NULL;
   save = client->circbuff_read.rpos;
   str = circbuff_read(&(client->circbuff_read));
-  if (str)
+  if (str != NULL)
     {
-      tmp = strtok(strdup(str), "\n");
-    if (isPrintable(tmp) != 0)
-  {
-          printf("TEST %s\n", tmp);
-  	  client->circbuff_read.rpos = save + isPrintable(tmp);
-      client->circbuff_r = 1;
-  	  return (NULL);
-      }
-      if (strlen(tmp) == strlen(str))
+      if (check_conform(str) == 0)
 	{
-	  client->circbuff_r = 1;
-	  return (NULL);
-	}
-      if (check_conform(tmp) == 0)
-      {
-  	  client->circbuff_read.rpos = save;
+	  printf("NON CONFORM [%p]\n", str);
+	  client->circbuff_read.rpos = save;
   	  return (NULL);
 	}
-      if (strlen(tmp) != strlen(str))
-        {
-          client->circbuff_read.rpos -= (strlen(str) - strlen(tmp)) - 1;
-          client->circbuff_r = 1;
-        }
-      else
-	client->circbuff_r = 1;
+      printf("DEBUG 1 [%p] BeforePos[%d] data[%s]\n", str, save, str);
+      client->circbuff_r--;
     }
-  return (tmp);
+  return (str);
 }
