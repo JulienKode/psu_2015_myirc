@@ -121,6 +121,7 @@ void Interface::refresh()
 	  std::cout << " FD " << tmp->fd << " CB " << tmp->circbuff_r << std::endl;
 	  if (tmp->fd_type != FD_FREE && tmp->circbuff_r > 0)
               {
+		std::cout << "Gros boeuf " << std::endl;
                   buf = get_buff_read_underground(tmp);
                   if (buf)
                     {

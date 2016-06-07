@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Mon May 16 10:41:14 2016 Julien Karst
-// Last update Sun Jun  5 20:25:32 2016 
+// Last update Wed Jun  8 01:27:26 2016 
 */
 
 #include "../../includes/irc.h"
@@ -169,6 +169,7 @@ void			fd_action_client
 	  printf("Cricbuff Write FD[%d]\n", tmp->fd);
 	  printf("FD[%d] READ[%d] WRITE[%d]\n", tmp->fd, tmp->circbuff_r, tmp->circbuff_w);
 	  buf = circbuff_read(&(tmp->circbuff_write));
+	  printf("WRITE[%s]\n", buf);
 	  if (buf)
 	    {
 	      size = (int)write(tmp->fd, buf, strlen(buf));

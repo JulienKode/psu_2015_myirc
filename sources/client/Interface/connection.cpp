@@ -67,6 +67,7 @@ void Connection::on_connect_clicked()
             tmp = tmp->next;
          }
         client_nick(tmp, (char *)ui->nick->text().toStdString().c_str(), NULL);
+	client_list(tmp, NULL, NULL);
         parent_ui->chat->addTab(textEdit, QIcon("sources/client/ico/server.png"), ui->name->text());
         QTreeWidgetItem *server = addTreeRoot(parent_ui->channels, ui->name->text(), ui->address->text());
         client_list(tmp, NULL, NULL);

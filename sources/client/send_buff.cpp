@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Sat Jun  4 16:34:17 2016
-// Last update Mon Jun  6 01:59:17 2016 
+// Last update Wed Jun  8 01:15:21 2016 
 */
 
 #include	"../../includes/irc.h"
@@ -26,7 +26,10 @@ void		send_buff_client_read(t_client *client, char *str)
   while (*tmp)
     {
       if (*tmp == '\n')
-	client->circbuff_r++;
+	{
+	  client->circbuff_r++;
+	  printf("Detect backslash n circbuff++ = %d \n", client->circbuff_r);
+	}
       tmp++;
     }
   printf("After circbuff = %d\n", client->circbuff_r);
