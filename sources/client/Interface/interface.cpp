@@ -118,7 +118,8 @@ void Interface::refresh()
         tmp = client->next->next;
         while (tmp->root == 0)
         {
-              if (tmp->fd_type != FD_FREE && tmp->circbuff_r == 1)
+	  std::cout << " FD " << tmp->fd << " CB " << tmp->circbuff_r << std::endl;
+	  if (tmp->fd_type != FD_FREE && tmp->circbuff_r > 0)
               {
                   buf = get_buff_read_underground(tmp);
                   if (buf)
@@ -296,4 +297,3 @@ void Interface::on_send_clicked()
 // Refresh en masse la liste ui->channels et le chat
 // Si on reçoit un PRIVMSG, ouvrir une tab (si elle n'est pas deja ouverte), sinon écrite dans la tab ouverte et surligner nom en rouge
 // A chaque envoi depuis le client, décaler la structure client avant d'appeler la fonction (ex : nick)
-

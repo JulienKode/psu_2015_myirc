@@ -5,7 +5,7 @@
 ** Login   <karst_j@epitech.net>
 **
 ** Started on  Sat Jun  4 18:35:45 2016
-// Last update Sun Jun  5 17:26:19 2016
+// Last update Mon Jun  6 19:01:46 2016 
 */
 
 #include "../../includes/irc.h"
@@ -28,10 +28,12 @@ void		client_list(t_client *client, char *list, char *ok)
   char		*str;
 
   (void) ok;
+  printf("IN LIST FD[%d] READ[%d] WRITE[%d]\n", client->fd, client->circbuff_r, client->circbuff_w);
   if (list != NULL)
     asprintf(&str, "LIST %s\r\n", list);
   else
     asprintf(&str, "LIST\r\n");
+  printf("IN LIST FD[%d] READ[%d] WRITE[%d]\n", client->fd, client->circbuff_r, client->circbuff_w);
   send_buff_client_write(client, str);
 }
 
